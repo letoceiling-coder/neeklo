@@ -1,0 +1,32 @@
+[
+  {
+    "name": "TechCorp",
+    "logo": "techcorp",
+    "url": "https://techcorp.example.com"
+  },
+  {
+    "name": "InnovateLab",
+    "logo": "innovatelab",
+    "url": "https://innovatelab.example.com"
+  },
+  {
+    "name": "DigitalFlow",
+    "logo": "digitalflow",
+    "url": "https://digitalflow.example.com"
+  },
+  {
+    "name": "BrandStudio",
+    "logo": "brandstudio",
+    "url": "https://brandstudio.example.com"
+  },
+  {
+    "name": "StartupHub",
+    "logo": "startuphub",
+    "url": "https://startuphub.example.com"
+  },
+  {
+    "name": "CreativeLabs",
+    "logo": "creativelabs",
+    "url": "https://creativelabs.example.com"
+  }
+]

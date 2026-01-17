@@ -1,0 +1,183 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { MessageCircle, ArrowDown, Home } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface ProductHeroCompactProps {
+  badge: string;
+  title: string;
+  subtitle: string;
+  priceFrom: string;
+  duration: string;
+  chips: string[];
+  telegramLink?: string;
+  onScrollToPackages?: () => void;
+}
+
+export function ProductHeroCompact({
+  badge,
+  title,
+  subtitle,
+  priceFrom,
+  duration,
+  chips,
+  telegramLink = "https://t.me/neeklo",
+  onScrollToPackages,
+}: ProductHeroCompactProps) {
+  const handleTelegram = () => {
+    const message = encodeURIComponent(`Здравствуйте! Интересует ${title}`);
+    window.open(`${telegramLink}?text=${message}`, "_blank");
+  };
+
+  const handleScrollToExamples = () => {
+    const el = document.getElementById("examples");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  return (
+    <section className="pt-24 pb-8 md:pt-28 lg:pt-32 md:pb-12">
+      <div className="container max-w-4xl mx-auto px-4">
+        {/* Breadcrumb */}
+        <motion.nav
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="flex items-center gap-2 text-sm text-muted-foreground mb-6"
+        >
+          <Link
+            to="/"
+            className="hover:text-foreground transition-colors flex items-center gap-1"
+          >
+            <Home className="w-3.5 h-3.5" />
+          </Link>
+          <span className="text-muted-foreground/50">/</span>
+          <Link to="/products" className="hover:text-foreground transition-colors">
+            Каталог
+          </Link>
+          <span className="text-muted-foreground/50">/</span>
+          <span className="text-foreground font-medium">{title}</span>
+        </motion.nav>
+
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3, delay: 0.05 }}
+          className="mb-4"
+        >
+          <span
+            className={cn(
+              "inline-flex items-center px-3 py-1",
+              "text-xs font-medium",
+              "rounded-full",
+              "bg-primary/10 text-primary",
+              "border border-primary/20"
+            )}
+          >
+            {badge}
+          </span>
+        </motion.div>
+
+        {/* Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3"
+        >
+          {title}
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          className="text-base md:text-lg text-muted-foreground mb-5 max-w-xl"
+        >
+          {subtitle}
+        </motion.p>
+
+        {/* Price & Duration */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="flex items-center gap-3 mb-5"
+        >
+          <span className="text-xl md:text-2xl font-bold text-foreground">
+            {priceFrom}
+          </span>
+          <span className="text-muted-foreground">·</span>
+          <span className="text-sm md:text-base text-muted-foreground">
+            {duration}
+          </span>
+        </motion.div>
+
+        {/* Chips */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.25 }}
+          className="flex flex-wrap gap-2 mb-6"
+        >
+          {chips.map((chip, index) => (
+            <span
+              key={index}
+              className={cn(
+                "px-3 py-1.5",
+                "text-xs md:text-sm",
+                "rounded-lg",
+                "bg-muted/50 text-foreground",
+                "border border-border/50"
+              )}
+            >
+              {chip}
+            </span>
+          ))}
+        </motion.div>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          className="flex flex-wrap items-center gap-3"
+        >
+          <button
+            onClick={onScrollToPackages || handleTelegram}
+            className={cn(
+              "inline-flex items-center justify-center gap-2",
+              "px-5 py-2.5 md:px-6 md:py-3",
+              "rounded-xl",
+              "bg-primary text-primary-foreground",
+              "font-medium text-sm",
+              "hover:bg-primary/90 transition-colors",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            )}
+          >
+            <MessageCircle className="w-4 h-4" />
+            Обсудить проект
+          </button>
+
+          <button
+            onClick={handleScrollToExamples}
+            className={cn(
+              "inline-flex items-center gap-1.5",
+              "px-4 py-2.5",
+              "text-sm font-medium text-muted-foreground",
+              "hover:text-foreground transition-colors"
+            )}
+          >
+            Примеры
+            <ArrowDown className="w-4 h-4" />
+          </button>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

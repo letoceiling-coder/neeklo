@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Александр Иванов",
+    "role": "Creative Director",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
+    "bio": "10+ лет в дизайне и брендинге"
+  },
+  {
+    "id": 2,
+    "name": "Мария Петрова",
+    "role": "Lead Designer",
+    "avatar": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
+    "bio": "Специалист по UI/UX и motion-дизайну"
+  },
+  {
+    "id": 3,
+    "name": "Дмитрий Смирнов",
+    "role": "Tech Lead",
+    "avatar": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+    "bio": "Fullstack разработчик, React эксперт"
+  }
+]

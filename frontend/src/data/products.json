@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "title": "AI-агент под ключ",
+    "description": "Настроим и интегрируем AI-агента, который работает как ваш digital-сотрудник: поддержка, продажи, HR.",
+    "accentColor": "blue",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Узнать больше",
+    "ctaLink": "/products/ai-agent",
+    "position": 1
+  },
+  {
+    "id": 2,
+    "title": "Сайт за 5 дней",
+    "description": "Запуск продающего сайта или landing-page на новейших технологиях — дизайн, SEO, интеграции.",
+    "accentColor": "purple",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Начать проект",
+    "ctaLink": "/products/website",
+    "position": 2
+  },
+  {
+    "id": 3,
+    "title": "Автоматизация отдела",
+    "description": "Оптимизируем бизнес-процессы: интеграция, CRM, рассылки, автономные пайплайны.",
+    "accentColor": "blue",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Автоматизировать",
+    "ctaLink": "/products/automation",
+    "position": 3
+  },
+  {
+    "id": 4,
+    "title": "AI-видео-продакшн X10",
+    "description": "Снимем и сгенерируем до 10 видеороликов за одну неделю для рекламы, презентаций и соцсетей.",
+    "accentColor": "orange",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Создать видео",
+    "ctaLink": "/products/ai-video",
+    "position": 4
+  },
+  {
+    "id": 5,
+    "title": "Telegram-бот",
+    "description": "Кастомный бот с интеграциями, оплатой, рассылками и WebApp интерфейсом.",
+    "accentColor": "green",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Разработать",
+    "ctaLink": "/products/telegram-bot",
+    "position": 5
+  },
+  {
+    "id": 6,
+    "title": "Digital-экосистема 360°",
+    "description": "Все digital-активы — сайт, бот, CRM, AI, видео — интегрируем в единую экосистему для вашего бизнеса.",
+    "accentColor": "purple",
+    "thumbnail": "",
+    "videoPreview": "",
+    "ctaText": "Начать",
+    "ctaLink": "/products/ecosystem",
+    "position": 6
+  }
+]

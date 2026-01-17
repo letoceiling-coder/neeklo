@@ -1,0 +1,29 @@
+{
+  "design": [
+    { "name": "Figma", "icon": "Figma" },
+    { "name": "Adobe XD", "icon": "Palette" },
+    { "name": "Spline", "icon": "Box" },
+    { "name": "Blender", "icon": "Cube" }
+  ],
+  "web": [
+    { "name": "React", "icon": "Code2" },
+    { "name": "Next.js", "icon": "Triangle" },
+    { "name": "Vue", "icon": "Layers" },
+    { "name": "Tailwind CSS", "icon": "Sparkles" }
+  ],
+  "animation": [
+    { "name": "GSAP", "icon": "Zap" },
+    { "name": "Framer Motion", "icon": "Move" },
+    { "name": "Three.js", "icon": "Globe" }
+  ],
+  "backend": [
+    { "name": "Node.js", "icon": "Server" },
+    { "name": "Supabase", "icon": "Database" },
+    { "name": "Firebase", "icon": "Flame" }
+  ],
+  "tools": [
+    { "name": "Git", "icon": "GitBranch" },
+    { "name": "Notion", "icon": "FileText" },
+    { "name": "Slack", "icon": "MessageSquare" }
+  ]
+}
