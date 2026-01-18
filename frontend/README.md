@@ -6,7 +6,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?logo=vite)](https://vitejs.dev/)
-[![Supabase](https://img.shields.io/badge/Supabase-Cloud-3FCF8E?logo=supabase)](https://supabase.com/)
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?logo=laravel)](https://laravel.com/)
 
 ---
 
@@ -54,12 +54,12 @@
 | **shadcn/ui** | latest | UI-компоненты |
 | **Lucide React** | latest | Иконки |
 
-### Backend (Lovable Cloud)
+### Backend (Laravel)
 | Технология | Назначение |
 |------------|------------|
-| **Supabase** | База данных, хранилище, Edge Functions |
-| **PostgreSQL** | Реляционная БД |
-| **Deno** | Runtime для Edge Functions |
+| **Laravel** | Backend API и бизнес-логика |
+| **MySQL** | Реляционная БД |
+| **Laravel Storage** | Хранилище файлов |
 
 ### PWA
 - **vite-plugin-pwa** — Progressive Web App с офлайн-режимом
@@ -91,7 +91,7 @@
 │   │
 │   ├── data/                   # JSON-данные (кейсы, продукты, услуги)
 │   ├── hooks/                  # Кастомные React-хуки
-│   ├── integrations/           # Supabase клиент (auto-generated)
+│   ├── lib/                    # API клиент для Laravel
 │   ├── lib/                    # Утилиты и валидации
 │   ├── pages/                  # Страницы приложения
 │   │   └── products/           # Продуктовые страницы
@@ -101,12 +101,9 @@
 │   ├── main.tsx                # Точка входа
 │   └── index.css               # Глобальные стили и CSS-переменные
 │
-├── supabase/
-│   ├── config.toml             # Конфигурация Supabase (auto-generated)
-│   └── functions/              # Edge Functions
-│       ├── send-telegram/      # Отправка заявок в Telegram
-│       ├── generate-brief/     # Генерация брифа
-│       └── task-wizard-ai/     # AI-обработка задач
+├── lib/                        # Утилиты и API клиент
+│   ├── api.ts                  # Laravel API клиент
+│   └── validations/            # Валидации форм
 │
 ├── .env                        # Переменные окружения (auto-generated)
 ├── vite.config.ts              # Конфигурация Vite
@@ -155,25 +152,14 @@ npm run format
 
 ## 🔐 Переменные окружения
 
-Файл `.env` генерируется автоматически при подключении к Lovable Cloud и содержит:
+Файл `.env` содержит переменные окружения для Laravel API:
 
 ```env
-# Публичные ключи (безопасно хранить в коде)
-VITE_SUPABASE_URL="https://oomztofvhlqnjegocojv.supabase.co"
-VITE_SUPABASE_PUBLISHABLE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-VITE_SUPABASE_PROJECT_ID="oomztofvhlqnjegocojv"
+# Laravel API URL (опционально, по умолчанию /api)
+VITE_API_URL="/api"
 ```
 
-### Секреты (хранятся в Supabase Secrets)
-
-| Секрет | Назначение |
-|--------|------------|
-| `TELEGRAM_BOT_TOKEN` | Токен Telegram-бота для уведомлений |
-| `TELEGRAM_CHAT_ID` | ID чата для получения заявок |
-| `LOVABLE_API_KEY` | Ключ для Lovable AI |
-| `SUPABASE_SERVICE_ROLE_KEY` | Сервисный ключ (только для Edge Functions) |
-
-> ⚠️ **Важно:** Секреты управляются через Lovable Cloud UI и недоступны в коде.
+> ⚠️ **Важно:** Все API запросы идут через Laravel backend. Telegram настройки находятся в Laravel `.env` файле.
 
 ---
 
@@ -268,9 +254,9 @@ vercel
 ### Пример вызова
 
 ```typescript
-import { supabase } from "@/integrations/supabase/client";
+import { sendTelegramMessage } from "@/lib/api";
 
-const { data, error } = await supabase.functions.invoke('send-telegram', {
+const result = await sendTelegramMessage({
   body: {
     name: 'Иван',
     contact: '+7 999 999-99-99',
