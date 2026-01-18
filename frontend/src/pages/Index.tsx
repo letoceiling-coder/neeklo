@@ -20,7 +20,7 @@ const Index = () => {
 
   // Set SEO meta tags
   useMetaTags(
-    "Neeklo Studio — Сайты, боты и контент для бизнеса",
+    "Neeklo Studio — Сайты, чат боты и видео для роста бизнеса",
     "Готовые решения под ключ за 7–14 дней. Сайты, Telegram-боты, AI-видео и Mini App.",
     "https://neeklo.studio/og-image.png",
     "https://neeklo.studio/",
