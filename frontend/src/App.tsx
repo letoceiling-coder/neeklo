@@ -11,6 +11,7 @@ import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { CookieConsent } from "@/components/common/CookieConsent";
 import { PageLoader } from "@/components/common/PageLoader";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { MobileMenu } from "@/components/ui/MobileMenu";
 import { usePreloadRoutes } from "@/hooks/usePreloadRoutes";
 import { useWebVitals } from "@/hooks/useWebVitals";
@@ -121,6 +122,7 @@ function AppContent() {
 
   return (
     <>
+      <ScrollToTop />
       <MainNav />
       <ErrorBoundary>
         <PageTransition>

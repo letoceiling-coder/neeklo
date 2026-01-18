@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, ArrowRight, FileText, Package, Briefcase, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Search, X, ArrowRight, FileText, Package, Briefcase, Users, Video, Bot, Globe, Cog, Palette, Smartphone, Zap, Target, MessageCircle } from "lucide-react";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
@@ -11,89 +12,47 @@ interface SearchResult {
   href: string;
   category: string;
   icon: React.ReactNode;
+  keywords: string[]; // Дополнительные ключевые слова для поиска
 }
 
-// Static searchable content
+// Расширенный поисковый контент со всеми ключевыми словами
 const searchableContent: SearchResult[] = [
+  // Главные секции
   {
     id: "products",
     title: "Продукты",
     excerpt: "AI-агенты, веб-сайты, Telegram-боты, AI-видео и автоматизация",
-    href: "#products",
+    href: "/products",
     category: "Секция",
     icon: <Package className="w-4 h-4" />,
-  },
-  {
-    id: "services",
-    title: "Услуги",
-    excerpt: "Полный спектр digital-услуг для вашего бизнеса",
-    href: "#services",
-    category: "Секция",
-    icon: <Briefcase className="w-4 h-4" />,
+    keywords: ["каталог", "товары", "услуги", "решения", "digital", "продукция"],
   },
   {
     id: "cases",
     title: "Кейсы",
     excerpt: "Примеры успешных проектов и реализованных решений",
-    href: "#cases",
+    href: "/work",
     category: "Секция",
     icon: <FileText className="w-4 h-4" />,
+    keywords: ["портфолио", "работы", "проекты", "примеры", "результаты", "кейсы"],
   },
   {
     id: "process",
     title: "Процесс работы",
     excerpt: "Этапы разработки: диагностика, стратегия, дизайн, разработка",
-    href: "#process",
+    href: "/process",
     category: "Секция",
     icon: <FileText className="w-4 h-4" />,
+    keywords: ["как мы работаем", "этапы", "методология", "диагностика", "стратегия", "разработка"],
   },
   {
     id: "about",
     title: "О нас",
     excerpt: "Команда Neeklo Studio и наш подход к работе",
-    href: "#about",
-    category: "Секция",
+    href: "/about",
+    category: "Страница",
     icon: <Users className="w-4 h-4" />,
-  },
-  {
-    id: "ai-agent",
-    title: "AI-агенты",
-    excerpt: "Интеллектуальные ассистенты для автоматизации бизнес-процессов",
-    href: "/products/ai-agent",
-    category: "Продукт",
-    icon: <Package className="w-4 h-4" />,
-  },
-  {
-    id: "website",
-    title: "Веб-сайты",
-    excerpt: "Современные адаптивные сайты с уникальным дизайном",
-    href: "/products/website",
-    category: "Продукт",
-    icon: <Package className="w-4 h-4" />,
-  },
-  {
-    id: "telegram-bot",
-    title: "Telegram-боты",
-    excerpt: "Автоматизация коммуникации и бизнес-процессов в Telegram",
-    href: "/products/telegram-bot",
-    category: "Продукт",
-    icon: <Package className="w-4 h-4" />,
-  },
-  {
-    id: "ai-video",
-    title: "AI-видео",
-    excerpt: "Генерация видеоконтента с помощью искусственного интеллекта",
-    href: "/products/ai-video",
-    category: "Продукт",
-    icon: <Package className="w-4 h-4" />,
-  },
-  {
-    id: "automation",
-    title: "Автоматизация",
-    excerpt: "Оптимизация рабочих процессов и интеграция систем",
-    href: "/products/automation",
-    category: "Продукт",
-    icon: <Package className="w-4 h-4" />,
+    keywords: ["команда", "студия", "о компании", "подход", "философия"],
   },
   {
     id: "contact",
@@ -101,15 +60,118 @@ const searchableContent: SearchResult[] = [
     excerpt: "Свяжитесь с нами для обсуждения вашего проекта",
     href: "/contact",
     category: "Страница",
-    icon: <Users className="w-4 h-4" />,
+    icon: <MessageCircle className="w-4 h-4" />,
+    keywords: ["связаться", "написать", "заявка", "телефон", "email", "telegram"],
+  },
+  
+  // Продукты
+  {
+    id: "ai-agent",
+    title: "AI-агент",
+    excerpt: "Интеллектуальные ассистенты для автоматизации бизнес-процессов, поддержка, продажи, HR",
+    href: "/products/ai-agent",
+    category: "Продукт",
+    icon: <Bot className="w-4 h-4" />,
+    keywords: ["искусственный интеллект", "ассистент", "нейросеть", "чат-бот", "автоматизация", "поддержка клиентов", "продажи", "hr"],
   },
   {
-    id: "work",
-    title: "Портфолио",
-    excerpt: "Наши работы и реализованные проекты",
-    href: "/work",
-    category: "Страница",
-    icon: <Briefcase className="w-4 h-4" />,
+    id: "website",
+    title: "Сайт для бизнеса",
+    excerpt: "Современные адаптивные сайты с уникальным дизайном, лендинги, корпоративные сайты, SEO",
+    href: "/products/website",
+    category: "Продукт",
+    icon: <Globe className="w-4 h-4" />,
+    keywords: ["веб-сайт", "лендинг", "landing page", "корпоративный сайт", "сайт-визитка", "интернет-магазин", "seo", "дизайн"],
+  },
+  {
+    id: "telegram-bot",
+    title: "Telegram-бот",
+    excerpt: "Автоматизация коммуникации и бизнес-процессов в Telegram, интеграции, оплата, рассылки",
+    href: "/products/telegram-bot",
+    category: "Продукт",
+    icon: <Bot className="w-4 h-4" />,
+    keywords: ["телеграм", "телеграм бот", "бот", "автоматизация", "рассылки", "оплата", "webapp", "mini app"],
+  },
+  {
+    id: "ai-video",
+    title: "AI-видео",
+    excerpt: "Генерация видеоконтента с помощью искусственного интеллекта, реклама, презентации, соцсети",
+    href: "/products/ai-video",
+    category: "Продукт",
+    icon: <Video className="w-4 h-4" />,
+    keywords: ["видео", "видеоконтент", "reels", "реклама", "промо", "видео-продакшн", "нейросети", "генерация видео"],
+  },
+  {
+    id: "mini-app",
+    title: "Mini App",
+    excerpt: "Приложения внутри Telegram для вашего бизнеса",
+    href: "/products/mini-app",
+    category: "Продукт",
+    icon: <Smartphone className="w-4 h-4" />,
+    keywords: ["мини апп", "telegram mini app", "приложение", "webapp", "веб-приложение"],
+  },
+  {
+    id: "automation",
+    title: "Автоматизация",
+    excerpt: "Оптимизация рабочих процессов и интеграция систем, CRM, воронки, пайплайны",
+    href: "/products/automation",
+    category: "Продукт",
+    icon: <Cog className="w-4 h-4" />,
+    keywords: ["автоматизация процессов", "интеграция", "crm", "воронки", "пайплайны", "workflow", "бизнес-процессы"],
+  },
+  {
+    id: "branding",
+    title: "Брендинг",
+    excerpt: "Айдентика и стиль для вашего бренда, логотип, фирменный стиль",
+    href: "/products/branding",
+    category: "Продукт",
+    icon: <Palette className="w-4 h-4" />,
+    keywords: ["айдентика", "логотип", "фирменный стиль", "брендбук", "дизайн", "брендинг"],
+  },
+  {
+    id: "crm",
+    title: "CRM-интеграции",
+    excerpt: "Интеграция с CRM-системами для автоматизации продаж",
+    href: "/products/crm",
+    category: "Продукт",
+    icon: <Package className="w-4 h-4" />,
+    keywords: ["crm", "система управления", "продажи", "интеграция crm", "amoCRM", "bitrix24"],
+  },
+  {
+    id: "ecosystem",
+    title: "Digital-экосистема",
+    excerpt: "Все digital-активы — сайт, бот, CRM, AI, видео — интегрируем в единую экосистему",
+    href: "/products/ecosystem",
+    category: "Продукт",
+    icon: <Zap className="w-4 h-4" />,
+    keywords: ["экосистема", "интеграция", "комплексное решение", "360", "digital", "все в одном"],
+  },
+  {
+    id: "mobile-app",
+    title: "Мобильное приложение",
+    excerpt: "Нативные приложения для iOS и Android",
+    href: "/products/mobile-app",
+    category: "Продукт",
+    icon: <Smartphone className="w-4 h-4" />,
+    keywords: ["мобильное приложение", "ios", "android", "app", "нативное приложение"],
+  },
+  {
+    id: "support",
+    title: "Поддержка",
+    excerpt: "Техническая поддержка и обслуживание ваших проектов",
+    href: "/products/support",
+    category: "Продукт",
+    icon: <MessageCircle className="w-4 h-4" />,
+    keywords: ["поддержка", "обслуживание", "техподдержка", "поддержка сайта"],
+  },
+  {
+    id: "consulting",
+    title: "Консалтинг",
+    excerpt: "Консультации по digital-стратегии и развитию бизнеса",
+    href: "/products/consulting",
+    category: "Продукт",
+    icon: <Target className="w-4 h-4" />,
+    keywords: ["консалтинг", "консультация", "стратегия", "развитие бизнеса", "digital стратегия"],
   },
 ];
 
@@ -124,6 +186,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const shouldReduceMotion = usePrefersReducedMotion();
+  const navigate = useNavigate();
 
   // Focus input when modal opens
   useEffect(() => {
@@ -137,7 +200,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     }
   }, [isOpen]);
 
-  // Live search with debounce
+  // Live search with debounce and keyword matching
   useEffect(() => {
     if (query.length === 0) {
       setResults([]);
@@ -145,19 +208,60 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     }
 
     const timer = setTimeout(() => {
-      const lowerQuery = query.toLowerCase();
-      const filtered = searchableContent.filter(
-        (item) =>
-          item.title.toLowerCase().includes(lowerQuery) ||
-          item.excerpt.toLowerCase().includes(lowerQuery) ||
-          item.category.toLowerCase().includes(lowerQuery)
-      );
+      const lowerQuery = query.toLowerCase().trim();
+      const queryWords = lowerQuery.split(/\s+/).filter(Boolean);
+      
+      const filtered = searchableContent
+        .map((item) => {
+          // Проверяем все поля + keywords
+          const searchText = [
+            item.title.toLowerCase(),
+            item.excerpt.toLowerCase(),
+            item.category.toLowerCase(),
+            ...(item.keywords || []).map(k => k.toLowerCase())
+          ].join(' ');
+
+          // Подсчет совпадений для ранжирования
+          const matches = queryWords.filter(word => searchText.includes(word)).length;
+          const exactMatch = searchText.includes(lowerQuery);
+          
+          // Высокий приоритет: точное совпадение в заголовке
+          const titleMatch = item.title.toLowerCase().includes(lowerQuery);
+          
+          // Средний приоритет: начало заголовка или excerpt
+          const startsWith = item.title.toLowerCase().startsWith(lowerQuery) || 
+                            item.excerpt.toLowerCase().includes(lowerQuery);
+          
+          return {
+            ...item,
+            score: exactMatch ? 100 : (titleMatch ? 80 : (startsWith ? 60 : matches * 10))
+          };
+        })
+        .filter((item) => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(({ score, ...item }) => item); // Убираем score из результата
+
       setResults(filtered);
       setSelectedIndex(0);
     }, 150);
 
     return () => clearTimeout(timer);
   }, [query]);
+
+  const handleResultClick = useCallback((result: SearchResult) => {
+    if (result.href.startsWith("#")) {
+      // Якорная ссылка - скролл к секции на текущей странице
+      const element = document.getElementById(result.href.substring(1));
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.pushState(null, "", result.href);
+      }
+    } else {
+      // Навигация через React Router
+      navigate(result.href);
+    }
+    onClose();
+  }, [navigate, onClose]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -180,20 +284,7 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, results, selectedIndex, onClose]);
-
-  const handleResultClick = (result: SearchResult) => {
-    if (result.href.startsWith("#")) {
-      const element = document.getElementById(result.href.substring(1));
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.pushState(null, "", result.href);
-      }
-    } else {
-      window.location.href = result.href;
-    }
-    onClose();
-  };
+  }, [isOpen, results, selectedIndex, onClose, navigate, handleResultClick]);
 
   return (
     <AnimatePresence>
@@ -223,11 +314,23 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                 onClose();
               }
             }}
-            className="fixed top-[5%] sm:top-[10%] left-1/2 -translate-x-1/2 w-[95%] sm:w-[90%] max-w-[600px] max-h-[90vh] z-[201] touch-pan-x"
+            className={cn(
+              "fixed z-[201] touch-pan-x",
+              // Мобильные (320-767px): полноэкранный режим
+              "inset-0 w-full h-full max-w-none rounded-none",
+              // Планшеты (768-1024px): почти полноэкранный с отступами
+              "md:inset-auto md:top-[5%] md:left-1/2 md:-translate-x-1/2 md:w-[90%] md:max-w-[700px] md:h-auto md:max-h-[90vh] md:rounded-2xl",
+              // Десктоп (1025px+): всплывающий блок
+              "lg:top-[10%] lg:max-w-[600px]"
+            )}
           >
-            <div className="bg-card border border-border/50 rounded-2xl shadow-2xl overflow-hidden max-h-[85vh] flex flex-col">
+            <div className={cn(
+              "bg-card border border-border/50 shadow-2xl overflow-hidden flex flex-col h-full",
+              "rounded-none md:rounded-2xl",
+              "md:max-h-[85vh]"
+            )}>
               {/* Drag handle for mobile */}
-              <div className="flex justify-center pt-2 pb-1 md:hidden">
+              <div className="flex justify-center pt-3 pb-2 md:hidden">
                 <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
               </div>
 
@@ -263,7 +366,8 @@ export const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                     <p className="text-muted-foreground text-sm">
                       Начните вводить для поиска...
                     </p>
-                    <p className="text-muted-foreground/60 text-xs mt-2">
+                    {/* Подсказка Cmd+K только на десктопе (скрыта на мобильных и планшетах) */}
+                    <p className="hidden lg:block text-muted-foreground/60 text-xs mt-2">
                       Нажмите <kbd className="px-1.5 py-0.5 bg-secondary rounded text-[10px]">⌘K</kbd> для быстрого доступа
                     </p>
                   </div>
