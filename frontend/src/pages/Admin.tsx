@@ -20,7 +20,7 @@ const DOCUMENTATION = `# NEEKLO STUDIO — Полная документация
 - **Animations:** Framer Motion
 - **State:** React Query (TanStack)
 - **Routing:** React Router DOM v6
-- **Backend:** Supabase (Lovable Cloud)
+- **Backend:** Laravel 11 + MySQL
 - **UI Components:** Radix UI + shadcn/ui
 - **Icons:** Lucide React
 

@@ -257,11 +257,10 @@ vercel
 import { sendTelegramMessage } from "@/lib/api";
 
 const result = await sendTelegramMessage({
-  body: {
-    name: 'Иван',
-    contact: '+7 999 999-99-99',
-    description: 'Нужен сайт'
-  }
+  name: 'Иван',
+  phone: '+7 999 999-99-99',
+  role: 'Клиент',
+  description: 'Нужен сайт'
 });
 ```
 
