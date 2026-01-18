@@ -1,4 +1,4 @@
-import{j as e,m as s}from"./motion-vendor-CL5qKPaa.js";import{r as n}from"./react-vendor-BO546PVU.js";import{F as c}from"./products-x6hH14lb.js";import{F as d,ak as l,ae as x,aq as p,ar as m,ai as u,C as g,as as b}from"./ui-vendor-sCITR80W.js";const r=`# NEEKLO STUDIO — Полная документация проекта
+import{j as e,m as s}from"./motion-vendor-CL5qKPaa.js";import{r as n}from"./react-vendor-BO546PVU.js";import{F as c}from"./products-BHb0uQ39.js";import{F as d,K as l,ah as x,ap as p,aq as m,Z as u,C as g,ar as b}from"./ui-vendor-DCbmHlwp.js";const r=`# NEEKLO STUDIO — Полная документация проекта
 
 ## 📋 Обзор проекта
 
