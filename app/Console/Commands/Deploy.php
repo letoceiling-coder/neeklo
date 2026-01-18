@@ -82,10 +82,10 @@ class Deploy extends Command
                 
                 // Шаг 5: Создание коммита
                 $commitMessage = $this->createCommit($dryRun);
-                
-                // Шаг 6: Отправка в репозиторий
-                $this->pushToRepository($dryRun);
             }
+
+            // Шаг 6: Отправка в репозиторий (всегда, если есть локальные коммиты)
+            $this->pushToRepository($dryRun);
 
             // Шаг 7: Отправка POST запроса на сервер
             if (!$dryRun) {
@@ -534,7 +534,13 @@ class Deploy extends Command
             }
         }
 
-        $this->info("  ✅ Изменения отправлены в ветку: {$branch}" . ($forcePush ? " (force push)" : ""));
+        // Проверяем, были ли отправлены изменения
+        $output = $process->output();
+        if (str_contains($output, 'Everything up-to-date') || str_contains($process->errorOutput(), 'Everything up-to-date')) {
+            $this->line("  ℹ️  Ветка уже синхронизирована с удаленным репозиторием");
+        } else {
+            $this->info("  ✅ Изменения отправлены в ветку: {$branch}" . ($forcePush ? " (force push)" : ""));
+        }
         $this->newLine();
     }
 
