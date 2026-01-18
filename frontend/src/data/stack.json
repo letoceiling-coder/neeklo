@@ -18,7 +18,7 @@
   ],
   "backend": [
     { "name": "Node.js", "icon": "Server" },
-    { "name": "Supabase", "icon": "Database" },
+    { "name": "Laravel", "icon": "Database" },
     { "name": "Firebase", "icon": "Flame" }
   ],
   "tools": [

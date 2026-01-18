@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/common/Container";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { sendTelegramMessage } from "@/lib/api";
 import { Send, Loader2, Check, Sparkles } from "lucide-react";
 import Confetti from "@/components/ui/confetti";
 
@@ -57,17 +57,15 @@ export const ProductCTAForm = ({
     try {
       const selectedPkg = packages.find((p) => p.id === formData.package);
       
-      const { error } = await supabase.functions.invoke("send-telegram", {
-        body: {
-          name: formData.name,
-          phone: formData.contact,
-          email: "",
-          role: "Клиент",
-          description: `Продукт: ${productName}\nПакет: ${selectedPkg?.name || "Не выбран"}`,
-        },
+      const result = await sendTelegramMessage({
+        name: formData.name,
+        phone: formData.contact,
+        email: "",
+        role: "Клиент",
+        description: `Продукт: ${productName}\nПакет: ${selectedPkg?.name || "Не выбран"}`,
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
 
       toast.success("Заявка отправлена! Свяжемся в ближайшее время");
       setIsSuccess(true);

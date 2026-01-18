@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DeployController;
 use App\Http\Controllers\Api\SupportController;
 use App\Http\Controllers\Api\BotController;
+use App\Http\Controllers\Api\BriefSubmissionController;
 use App\Http\Controllers\Api\v1\FolderController;
 use App\Http\Controllers\Api\v1\MediaController;
 use Illuminate\Support\Facades\Route;
@@ -94,6 +95,13 @@ Route::post('/webhook/github', [\App\Http\Controllers\Api\WebhookController::cla
 
 // Проверка подписки (публичный endpoint, используется фронтендом)
 Route::get('/subscription/check', [\App\Http\Controllers\Api\SubscriptionCheckController::class, 'check']);
+
+// Публичные роуты для brief submissions (формы на сайте)
+Route::prefix('brief-submissions')->group(function () {
+    Route::post('/', [BriefSubmissionController::class, 'store']);
+    Route::post('/upload-files', [BriefSubmissionController::class, 'uploadFiles']);
+    Route::post('/send-telegram', [BriefSubmissionController::class, 'sendTelegramMessage']);
+});
 
 // Публичные роуты для просмотра логов
 Route::get('/logs', [\App\Http\Controllers\LogController::class, 'getLogs']);

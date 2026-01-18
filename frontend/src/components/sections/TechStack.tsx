@@ -12,7 +12,7 @@ const tools = [
   { name: "TypeScript", category: "Frontend" },
   { name: "Tailwind CSS", category: "Frontend" },
   { name: "Node.js", category: "Backend" },
-  { name: "Supabase", category: "Backend" },
+  { name: "Laravel", category: "Backend" },
   { name: "GSAP", category: "Animation" },
   { name: "Framer Motion", category: "Animation" },
 ];

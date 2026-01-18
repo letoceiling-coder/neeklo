@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Loader2, Check, Globe, MessageSquare, Video, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { supabase } from "@/integrations/supabase/client";
+import { sendTelegramMessage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 const products = [
@@ -97,16 +97,14 @@ export const QuickOrderForm = ({ isOpen, onClose, preselectedProduct }: QuickOrd
         .replace(/<[^>]*>/g, '')
         .slice(0, 500);
 
-      const { error } = await supabase.functions.invoke("send-telegram", {
-        body: {
-          name: trimmedName.slice(0, 100),
-          phone: trimmedContact.slice(0, 50),
-          description: `🛒 Быстрый заказ: ${productName}${sanitizedComment ? `\n\n💬 Комментарий: ${sanitizedComment}` : ""}`,
-          role: "Быстрый заказ",
-        },
+      const result = await sendTelegramMessage({
+        name: trimmedName.slice(0, 100),
+        phone: trimmedContact.slice(0, 50),
+        description: `🛒 Быстрый заказ: ${productName}${sanitizedComment ? `\n\n💬 Комментарий: ${sanitizedComment}` : ""}`,
+        role: "Быстрый заказ",
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
 
       setIsSuccess(true);
       

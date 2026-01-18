@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import InputMask from "react-input-mask";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadFiles, submitBriefSubmission } from "@/lib/api";
 import { briefFormSchema, BriefFormData, FileMetadata } from "@/lib/validations/briefForm";
 import { FileUpload } from "./FileUpload";
 import { SuccessModal } from "./SuccessModal";
@@ -35,31 +35,16 @@ export const BriefForm = () => {
 
   const privacyConsent = watch("privacyConsent");
 
-  const uploadFiles = async (submissionId: string): Promise<FileMetadata[]> => {
-    const uploadPromises = files.map(async (file) => {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${submissionId}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("attachments")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("attachments")
-        .getPublicUrl(filePath);
-
-      return {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        url: publicUrl,
-      };
-    });
-
-    return await Promise.all(uploadPromises);
+  const handleFileUpload = async (submissionId: string): Promise<FileMetadata[]> => {
+    if (files.length === 0) return [];
+    
+    const result = await uploadFiles(files, submissionId);
+    
+    if (!result.success) {
+      throw new Error(result.message || 'Ошибка загрузки файлов');
+    }
+    
+    return (result.files || []) as FileMetadata[];
   };
 
   const onSubmit = async (data: BriefFormData) => {
@@ -72,22 +57,24 @@ export const BriefForm = () => {
       // Upload files if any
       let fileMetadata: FileMetadata[] = [];
       if (files.length > 0) {
-        fileMetadata = await uploadFiles(submissionId);
+        fileMetadata = await handleFileUpload(submissionId);
       }
 
-      // Insert to database
-      const { error } = await supabase.from("brief_submissions").insert([{
+      // Insert to database and send to Telegram (handled by backend)
+      const result = await submitBriefSubmission({
         name: data.name,
-        company: data.company || null,
+        company: data.company,
         role: data.role,
-        project_name: data.projectName || null,
+        project_name: data.projectName,
         description: data.description,
         phone: data.phone,
         email: data.email,
-        files: fileMetadata as any,
-      }]);
+        files: fileMetadata,
+      });
 
-      if (error) throw error;
+      if (!result.success) {
+        throw new Error(result.message || 'Ошибка отправки');
+      }
 
       // Show success modal
       setShowSuccess(true);

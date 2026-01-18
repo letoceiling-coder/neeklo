@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2, Paperclip, X, Check, Plus, Send, MessageCircle, CheckCircle2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadFiles, submitBriefSubmission } from "@/lib/api";
 import { Container } from "../common/Container";
 
 // Simplified schema
@@ -71,26 +71,16 @@ export const ContactFormSection = () => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const uploadFiles = async (submissionId: string) => {
-    const uploadPromises = files.map(async (file) => {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${submissionId}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("attachments")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("attachments")
-        .getPublicUrl(filePath);
-
-      return { name: file.name, size: file.size, type: file.type, url: publicUrl };
-    });
-
-    return await Promise.all(uploadPromises);
+  const handleFileUpload = async (submissionId: string) => {
+    if (files.length === 0) return [];
+    
+    const result = await uploadFiles(files, submissionId);
+    
+    if (!result.success) {
+      throw new Error(result.message || 'Ошибка загрузки файлов');
+    }
+    
+    return result.files || [];
   };
 
   const onSubmit = async (data: ContactFormData) => {
@@ -100,31 +90,22 @@ export const ContactFormSection = () => {
 
       let fileMetadata: any[] = [];
       if (files.length > 0) {
-        fileMetadata = await uploadFiles(submissionId);
+        fileMetadata = await handleFileUpload(submissionId);
       }
 
-      // Send to database
-      const { error } = await supabase.from("brief_submissions").insert([{
+      // Send to database and Telegram (handled by backend)
+      const result = await submitBriefSubmission({
         name: data.name,
         role: "Клиент",
         description: data.description,
         phone: data.contact,
         email: data.email || "",
         files: fileMetadata,
-      }]);
-
-      if (error) throw error;
-
-      // Send to Telegram
-      await supabase.functions.invoke("send-telegram", {
-        body: {
-          name: data.name,
-          phone: data.contact,
-          email: data.email || "не указан",
-          role: "Заявка с сайта",
-          description: data.description,
-        },
       });
+
+      if (!result.success) {
+        throw new Error(result.message || 'Ошибка отправки');
+      }
 
       setShowSuccess(true);
       reset();

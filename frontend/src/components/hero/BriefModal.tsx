@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Edit3, Check, Loader2, Globe, Video, Bot, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { sendTelegramMessage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 export interface BriefData {
@@ -155,11 +155,24 @@ export function BriefModal({ isOpen, onClose, briefData, userInput, onBriefUpdat
     
     setIsSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke('send-telegram', {
-        body: { briefData: currentData, userInput }
+      // Format brief data for Telegram
+      const description = `📋 Бриф проекта\n\n${Object.entries(currentData).map(([key, value]) => {
+        const labels: Record<string, string> = {
+          project_summary: '📝 Краткое описание проекта',
+          technical_requirements: '⚙️ Технические требования',
+          timeline_budget: '💰 Сроки и бюджет',
+        };
+        return `${labels[key] || key}: ${value}`;
+      }).join('\n\n')}${userInput ? `\n\n💬 Дополнительная информация:\n${userInput}` : ''}`;
+
+      const result = await sendTelegramMessage({
+        name: 'Клиент',
+        phone: 'не указан',
+        role: 'Бриф проекта',
+        description,
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
 
       toast({
         title: "Бриф отправлен!",

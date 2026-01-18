@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { Mail, Send, MapPin, Phone, Check, Loader2, ArrowRight, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import Confetti from "@/components/ui/confetti";
-import { supabase } from "@/integrations/supabase/client";
+import { sendTelegramMessage } from "@/lib/api";
 
 const contactSchema = z.object({
   name: z.string()
@@ -147,16 +147,14 @@ const Contact = () => {
     try {
       const serviceName = services.find(s => s.value === data.service)?.label || data.service;
       
-      const { error } = await supabase.functions.invoke("send-telegram", {
-        body: {
-          name: data.name.trim().slice(0, 100),
-          phone: data.contact.trim().slice(0, 100),
-          description: `📋 Форма контактов\n\n🏷️ Услуга: ${serviceName}\n\n${data.message ? `💬 Сообщение: ${data.message.trim().slice(0, 500)}` : ""}`,
-          role: "Контактная форма",
-        },
+      const result = await sendTelegramMessage({
+        name: data.name.trim().slice(0, 100),
+        phone: data.contact.trim().slice(0, 100),
+        description: `📋 Форма контактов\n\n🏷️ Услуга: ${serviceName}\n\n${data.message ? `💬 Сообщение: ${data.message.trim().slice(0, 500)}` : ""}`,
+        role: "Контактная форма",
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
       
       toast({
         title: "Заявка отправлена! ✓",

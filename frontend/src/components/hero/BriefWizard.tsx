@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { RadioGroup, EmojiRadio } from "@/components/ui/emoji-radio-group";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { supabase } from "@/integrations/supabase/client";
+import { uploadFiles, sendTelegramMessage } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 // Attachment type definition
@@ -128,35 +128,26 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
     }
   };
 
-  // Upload files to Supabase Storage
-  const uploadFiles = async (): Promise<{ name: string; url: string }[]> => {
-    const uploadedFiles: { name: string; url: string }[] = [];
+  // Upload files to Laravel backend
+  const handleFileUpload = async (): Promise<{ name: string; url: string }[]> => {
     const fileAttachments = attachments.filter(a => a.type === 'file' && a.file);
     
-    for (const attachment of fileAttachments) {
-      if (!attachment.file) continue;
-      
-      const fileExt = attachment.file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `brief-attachments/${fileName}`;
-      
-      const { data, error } = await supabase.storage
-        .from('attachments')
-        .upload(filePath, attachment.file);
-      
-      if (error) {
-        console.error('File upload error:', error);
-        continue;
-      }
-      
-      const { data: { publicUrl } } = supabase.storage
-        .from('attachments')
-        .getPublicUrl(filePath);
-      
-      uploadedFiles.push({ name: attachment.name, url: publicUrl });
+    if (fileAttachments.length === 0) return [];
+    
+    const files = fileAttachments.map(a => a.file!).filter(Boolean);
+    const submissionId = `wizard-${Date.now()}`;
+    
+    const result = await uploadFiles(files, submissionId);
+    
+    if (!result.success) {
+      console.error('File upload error:', result.message);
+      return [];
     }
     
-    return uploadedFiles;
+    return (result.files || []).map((file, index) => ({
+      name: fileAttachments[index]?.name || file.name,
+      url: file.url,
+    }));
   };
 
   const handleSubmit = async () => {
@@ -165,7 +156,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
     setIsSending(true);
     try {
       // Upload files first
-      const uploadedFiles = await uploadFiles();
+      const uploadedFiles = await handleFileUpload();
       
       // Get link attachments
       const linkAttachments = attachments
@@ -183,21 +174,16 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
         ? `\n\n📎 Прикреплённые материалы:\n${allAttachments.map(a => `• ${a.name}: ${a.url}`).join('\n')}`
         : '';
 
-      const briefData = {
-        briefId: `wizard-${Date.now()}`,
-        project_summary: `Тип: ${projectTypeLabel}\n\n${answers.description}${attachmentsText}`,
-        technical_requirements: `Срочность: ${urgencyLabel}`,
-        timeline_budget: `Бюджет: ${budgetLabel}`,
-        deliverables: `Контакт: ${answers.contact}`,
-        generatedAt: new Date().toISOString(),
-        attachments: allAttachments,
-      };
+      const description = `📋 Бриф проекта\n\nТип: ${projectTypeLabel}\nСрочность: ${urgencyLabel}\nБюджет: ${budgetLabel}\n\n${answers.description}${attachmentsText}\n\n📞 Контакт: ${answers.contact}`;
 
-      const { error } = await supabase.functions.invoke('send-telegram', {
-        body: { briefData, userInput: answers.description }
+      const result = await sendTelegramMessage({
+        name: 'Клиент',
+        phone: answers.contact,
+        role: 'Бриф проекта (Wizard)',
+        description,
       });
 
-      if (error) throw error;
+      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
 
       toast({
         title: "🎉 Заявка отправлена!",
