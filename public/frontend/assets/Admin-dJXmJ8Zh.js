@@ -1,4 +1,4 @@
-import{j as e,m as s}from"./motion-vendor-nDYTcOWV.js";import{r as n}from"./react-vendor-DjCUvRuv.js";import{F as c}from"./products-q_HmqGnB.js";import{F as d,ak as l,ae as x,aq as p,ar as m,ai as u,C as g,as as b}from"./ui-vendor-D8upB8em.js";const r=`# NEEKLO STUDIO — Полная документация проекта
+import{j as e,m as s}from"./motion-vendor-CL5qKPaa.js";import{r as n}from"./react-vendor-BO546PVU.js";import{F as c}from"./products-x6hH14lb.js";import{F as d,ak as l,ae as x,aq as p,ar as m,ai as u,C as g,as as b}from"./ui-vendor-sCITR80W.js";const r=`# NEEKLO STUDIO — Полная документация проекта
 
 ## 📋 Обзор проекта
 
@@ -13,7 +13,7 @@ import{j as e,m as s}from"./motion-vendor-nDYTcOWV.js";import{r as n}from"./reac
 - **Animations:** Framer Motion
 - **State:** React Query (TanStack)
 - **Routing:** React Router DOM v6
-- **Backend:** Supabase (Lovable Cloud)
+- **Backend:** Laravel 11 + MySQL
 - **UI Components:** Radix UI + shadcn/ui
 - **Icons:** Lucide React
 
