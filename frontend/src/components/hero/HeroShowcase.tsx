@@ -21,7 +21,7 @@ export const HeroShowcase = memo(function HeroShowcase() {
             className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] text-foreground mb-3 leading-[1.2]"
             style={{ textWrap: 'balance' }}
           >
-            Сайты, чат боты{" "}
+            Сайты, чат-боты{" "}
             <span className="whitespace-nowrap">и видео</span>
             <br />
             для роста бизнеса
@@ -50,7 +50,7 @@ export const HeroShowcase = memo(function HeroShowcase() {
           <h1 
             className="text-[48px] xl:text-[56px] font-semibold tracking-[-0.03em] text-foreground mb-4 leading-[1.1]"
           >
-            Сайты, чат боты и видео
+            Сайты, чат-боты и видео
             <br />
             для роста бизнеса
           </h1>
