@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { Footer } from "@/components/layout/Footer";
 import { useMetaTags } from "@/hooks/useMetaTags";
+import { scrollToElement } from "@/lib/utils";
 import { ProductHeroCompact } from "./ProductHeroCompact";
 import { ProductExamples } from "./ProductExamples";
 import { ProductPackagesCompact } from "./ProductPackagesCompact";
@@ -70,10 +71,7 @@ export function ProductPageCompactTemplate({
   };
 
   const handleScrollToPackages = () => {
-    const el = document.getElementById("packages");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement("packages", 100, "smooth");
   };
 
   return (

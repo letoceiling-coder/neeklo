@@ -12,7 +12,7 @@ const DOCUMENTATION = `# NEEKLO STUDIO — Полная документация
 **Название:** Neeklo Studio
 **Тип:** Digital-студия / Агентство
 **Язык:** Русский (RU)
-**URL:** neeklo-motion-canvas.lovable.app
+**URL:** neeklo.studio
 
 ### Технологический стек
 - **Frontend:** React 18 + TypeScript + Vite
@@ -449,7 +449,7 @@ transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
 
 ## 🔌 Интеграции
 
-### Supabase (Lovable Cloud)
+### Supabase
 
 \`\`\`typescript
 import { supabase } from "@/integrations/supabase/client";

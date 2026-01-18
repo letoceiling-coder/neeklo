@@ -35,10 +35,12 @@ export const MainNav = () => {
   const shouldReduceMotion = usePrefersReducedMotion();
   const activeSection = useActiveSection();
 
-  // Watch for dark mode changes
+  // Watch for dark mode changes (dark mode is default, light mode has 'light-mode' class)
   useEffect(() => {
     const checkDarkMode = () => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
+      // Dark mode is default (no class), light mode has 'light-mode' class
+      const isLight = document.documentElement.classList.contains('light-mode');
+      setIsDarkMode(!isLight);
     };
     
     checkDarkMode();
@@ -112,7 +114,7 @@ export const MainNav = () => {
     return location.pathname === href;
   };
 
-  // Get appropriate logo based on theme
+  // Get appropriate logo based on theme (light logo on dark theme, dark logo on light theme)
   const currentLogo = isDarkMode ? logoLight : logoDark;
 
   return (
@@ -175,7 +177,7 @@ export const MainNav = () => {
                   decoding="async"
                   className={cn(
                     "w-auto transition-all duration-500 ease-out",
-                    scrolled ? "h-8 md:h-9" : "h-10 md:h-12 lg:h-14"
+                    scrolled ? "h-9 md:h-10" : "h-12 md:h-14 lg:h-16 xl:h-20"
                   )}
                 />
               </motion.div>
@@ -305,7 +307,7 @@ export const MainNav = () => {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border/20">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <img src={currentLogo} alt="Neeklo Studio" loading="lazy" decoding="async" className="h-10" />
+                  <img src={currentLogo} alt="Neeklo Studio" loading="lazy" decoding="async" className="h-12" />
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}

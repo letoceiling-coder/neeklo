@@ -17,8 +17,9 @@ import {
   Send
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { QuickOrderForm } from "@/components/common/QuickOrderForm";
+import { useMobile } from "@/hooks/useMobile";
 
 const aboutStructuredData = {
   "@context": "https://schema.org",
@@ -54,6 +55,7 @@ const About = () => {
   );
 
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
+  const isMobile = useMobile();
 
   // Value cards data
   const valueCards = [
@@ -106,7 +108,7 @@ const About = () => {
           {/* Video Background */}
           <div className="absolute inset-0 z-0">
             <video
-              autoPlay
+              autoPlay={!isMobile}
               muted
               loop
               playsInline

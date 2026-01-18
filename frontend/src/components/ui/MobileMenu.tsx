@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MessageCircle, ArrowRight } from "lucide-react";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { cn } from "@/lib/utils";
+import { cn, scrollToElement } from "@/lib/utils";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -17,11 +17,8 @@ export const MobileMenu = ({ isOpen, onClose, navItems, isActive }: MobileMenuPr
     if (href.startsWith('#')) {
       e.preventDefault();
       const targetId = href.substring(1);
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        window.history.pushState(null, '', href);
-      }
+      scrollToElement(targetId, 100, 'smooth');
+      window.history.pushState(null, '', href);
       onClose();
     }
   };

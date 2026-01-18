@@ -279,6 +279,8 @@ textarea:focus-visible {
   /* Prevent FOUC */
   html {
     background-color: hsl(0 0% 4%);
+    /* Global scroll padding for fixed header - accounts for navigation height */
+    scroll-padding-top: 100px;
   }
   
   html.light-mode {
@@ -300,6 +302,12 @@ textarea:focus-visible {
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Ensure sections have proper scroll margin for anchors */
+  section[id],
+  [id] {
+    scroll-margin-top: 100px;
   }
 
   /* Typography - Premium Hierarchy with fallbacks */

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Container } from "@/components/common/Container";
 import { ShoppingBag, Briefcase, GraduationCap, Users } from "lucide-react";
+import { scrollToElement } from "@/lib/utils";
 
 interface AudienceSegment {
   icon: React.ReactNode;
@@ -48,10 +49,7 @@ export const AudienceCards = ({
     if (onSegmentClick) {
       onSegmentClick(index);
     }
-    const element = document.getElementById("configurator");
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement("configurator", 100, "smooth");
   };
 
   return (

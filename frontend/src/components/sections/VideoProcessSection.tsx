@@ -206,7 +206,7 @@ export function VideoProcessSection({
                 loop
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata"
                 onLoadedData={handleVideoLoaded}
                 onCanPlayThrough={handleVideoLoaded}
                 onError={handleVideoError}

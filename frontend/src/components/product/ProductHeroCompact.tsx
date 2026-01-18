@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { MessageCircle, ArrowDown, Home } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, scrollToElement } from "@/lib/utils";
 
 interface ProductHeroCompactProps {
   badge: string;
@@ -32,10 +32,7 @@ export function ProductHeroCompact({
   };
 
   const handleScrollToExamples = () => {
-    const el = document.getElementById("examples");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement("examples", 100, "smooth");
   };
 
   return (

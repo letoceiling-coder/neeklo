@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Container } from "@/components/common/Container";
+import { scrollToElement } from "@/lib/utils";
 
 interface ProductHeroMinimalProps {
   badge: string;
@@ -27,10 +28,7 @@ export const ProductHeroMinimal = ({
   mockup,
 }: ProductHeroMinimalProps) => {
   const handleScrollTo = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+    scrollToElement(id, 100, "smooth");
   };
 
   return (

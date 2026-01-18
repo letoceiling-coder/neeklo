@@ -8,7 +8,7 @@ import { CompactCases } from "@/components/product/CompactCases";
 import { ProductFAQ } from "@/components/product/ProductFAQ";
 import { useMetaTags } from "@/hooks/useMetaTags";
 import productPages from "@/data/productPages.json";
-import { cn } from "@/lib/utils";
+import { cn, scrollToElement } from "@/lib/utils";
 
 import { ChevronLeft, ChevronRight, Home, MessageCircle, ArrowRight } from "lucide-react";
 
@@ -153,7 +153,7 @@ export const ProductPageTemplate = ({ data }: ProductPageTemplateProps) => {
                 </a>
                 <button
                   onClick={() => {
-                    document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' });
+                    scrollToElement('packages', 100, 'smooth');
                   }}
                   className={cn(
                     "inline-flex items-center gap-2",
