@@ -43,7 +43,12 @@
     "outcome": ["Готовый масштабируемый интернет-магазин."],
     "metrics": [{"value": "×3", "label": "Скорость обработки"}, {"value": "10+", "label": "Лет данных"}, {"value": "100%", "label": "Сохранность"}, {"value": "+20%", "label": "Конверсия"}],
     "testimonial": {"text": "Команда провела блестящую работу по миграции и модернизации нашего магазина.", "author": "Владелец BatNorton", "position": "CEO"},
-    "gallery": [{"type": "image", "src": "batnorton-1.jpg", "alt": "BatNorton Homepage"}]
+    "gallery": [
+      {"type": "image", "src": "batnorton-1.jpg", "alt": "BatNorton — Главная страница с каталогом"},
+      {"type": "image", "src": "batnorton-2.jpg", "alt": "BatNorton — Страница акций и скидок"},
+      {"type": "image", "src": "batnorton-3.jpg", "alt": "BatNorton — Secret Drop секция"},
+      {"type": "image", "src": "batnorton-4.jpg", "alt": "BatNorton — Админ-панель управления"}
+    ]
   },
   {
     "id": 3,

@@ -20,6 +20,12 @@ import glampingCover from "@/assets/cases/glamping-cover.jpg";
 import aiAgentCover from "@/assets/cases/ai-agent-cover.jpg";
 import aiVideoCover from "@/assets/cases/ai-video-cover.jpg";
 
+// Import gallery images for BatNorton
+import batnorton1 from "@/assets/cases/batnorton-1.jpg";
+import batnorton2 from "@/assets/cases/batnorton-2.jpg";
+import batnorton3 from "@/assets/cases/batnorton-3.jpg";
+import batnorton4 from "@/assets/cases/batnorton-4.jpg";
+
 // Map slugs to cover images
 const coverImages: Record<string, string> = {
   "povuzam": povuzamCover,
@@ -28,6 +34,14 @@ const coverImages: Record<string, string> = {
   "glamping": glampingCover,
   "ai-agent": aiAgentCover,
   "ai-video": aiVideoCover,
+};
+
+// Map gallery image filenames to imported images
+const galleryImages: Record<string, string> = {
+  "batnorton-1.jpg": batnorton1,
+  "batnorton-2.jpg": batnorton2,
+  "batnorton-3.jpg": batnorton3,
+  "batnorton-4.jpg": batnorton4,
 };
 
 const WorkDetail = () => {
@@ -225,7 +239,7 @@ const WorkDetail = () => {
             <CaseMediaGallery 
               items={caseData.gallery.map(item => ({
                 type: item.type as 'image' | 'video',
-                src: item.src,
+                src: galleryImages[item.src] || (item.src.startsWith('/') ? item.src : `/${item.src}`),
                 alt: item.alt,
                 poster: item.type === 'video' ? coverImages[caseData.slug] : undefined
               }))} 
