@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ChevronRight, Home } from "lucide-react";
+import { Home } from "lucide-react";
 
 interface BreadcrumbItem {
   label: string;
@@ -12,23 +12,23 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
   return (
-    <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-8">
+    <nav className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground mb-6 md:mb-8 flex-wrap">
       <Link 
         to="/" 
-        className="hover:text-primary transition-colors flex items-center"
+        className="hover:text-foreground transition-colors flex items-center gap-1"
       >
-        <Home className="w-4 h-4" />
+        <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
       </Link>
       
       {items.map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          <ChevronRight className="w-4 h-4" />
+        <div key={index} className="flex items-center gap-1.5 md:gap-2">
+          <span className="text-muted-foreground/50">/</span>
           {index === items.length - 1 ? (
-            <span className="text-foreground font-medium">{item.label}</span>
+            <span className="text-foreground font-medium truncate">{item.label}</span>
           ) : (
             <Link 
               to={item.url} 
-              className="hover:text-primary transition-colors"
+              className="hover:text-foreground transition-colors"
             >
               {item.label}
             </Link>

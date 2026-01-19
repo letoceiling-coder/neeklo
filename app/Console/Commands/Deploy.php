@@ -146,6 +146,17 @@ class Deploy extends Command
             $this->line('  ℹ️  Директория public/frontend не существует, пропускаем проверку для React приложения');
         }
 
+        // Копируем favicon.ico в корень public для доступности по /favicon.ico
+        $faviconSource = public_path('frontend/favicon.ico');
+        $faviconDest = public_path('favicon.ico');
+        if (File::exists($faviconSource)) {
+            File::copy($faviconSource, $faviconDest);
+            $this->line('  ✅ Favicon скопирован в корень public/');
+        } elseif (File::exists(base_path('frontend/public/favicon.ico'))) {
+            File::copy(base_path('frontend/public/favicon.ico'), $faviconDest);
+            $this->line('  ✅ Favicon скопирован из frontend/public в корень public/');
+        }
+
         $this->info('  ✅ Сборка завершена успешно');
         $this->newLine();
     }

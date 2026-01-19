@@ -4,7 +4,7 @@ import { useMetaTags } from "@/hooks/useMetaTags";
 import { StructuredData } from "@/components/common/StructuredData";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Currency, Clock, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Product catalog - clean, price-first format
@@ -162,29 +162,30 @@ const Products = () => {
             </motion.div>
 
             {/* Products Grid - clean cards with price + timeline */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {products.map((product, index) => (
                 <motion.div
                   key={product.slug}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: index * 0.03 }}
+                  className="h-full"
                 >
                   <div
                     className={cn(
-                      "group relative h-full",
-                      "rounded-[20px] md:rounded-[24px]",
-                      "p-5 md:p-6",
-                      "bg-foreground/[0.02] dark:bg-white/[0.025]",
-                      "border border-foreground/[0.06] dark:border-white/[0.06]",
-                      "hover:bg-foreground/[0.04] dark:hover:bg-white/[0.04]",
-                      "hover:border-foreground/[0.1] dark:hover:border-white/[0.1]",
-                      "transition-all duration-300"
+                      "group relative h-full flex flex-col",
+                      "rounded-xl",
+                      "p-6 md:p-8",
+                      "bg-background",
+                      "border border-border/50",
+                      "shadow-md hover:shadow-lg",
+                      "transition-all duration-300",
+                      "hover:-translate-y-2 hover:shadow-xl"
                     )}
                   >
                     {/* Category badge */}
                     <span className={cn(
-                      "inline-block px-2.5 py-1 rounded-lg mb-4",
+                      "inline-block px-3 py-1.5 rounded-lg mb-4 self-start",
                       "text-xs font-medium border",
                       categoryColors[product.category] || "bg-muted text-muted-foreground border-border"
                     )}>
@@ -192,36 +193,46 @@ const Products = () => {
                     </span>
 
                     {/* Title */}
-                    <h2 className="text-lg md:text-xl font-semibold text-foreground mb-3">
+                    <h2 className="text-xl md:text-2xl font-semibold text-foreground mb-6">
                       {product.title}
                     </h2>
 
-                    {/* Price + Timeline */}
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-5">
-                      <span className="text-base font-semibold text-foreground">
-                        {product.price}
-                      </span>
-                      <span className="text-sm text-muted-foreground">
-                        · {product.timeline}
-                      </span>
+                    {/* Price + Timeline with icons */}
+                    <div className="flex-1 flex flex-col gap-4 mb-6">
+                      {/* Price with icon */}
+                      <div className="flex items-center gap-2.5">
+                        <Currency className="w-5 h-5 text-primary flex-shrink-0" />
+                        <span className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+                          {product.price}
+                        </span>
+                      </div>
+                      
+                      {/* Duration with icon */}
+                      <div className="flex items-center gap-2.5">
+                        <Clock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                        <span className="text-base md:text-lg text-muted-foreground">
+                          {product.timeline}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* CTA Button - only clickable element */}
+                    {/* CTA Button */}
                     <Link
                       to={`/products/${product.slug}`}
                       className={cn(
-                        "inline-flex items-center gap-2",
-                        "px-4 py-2.5 rounded-xl",
+                        "inline-flex items-center justify-center gap-2",
+                        "w-full py-3 px-5",
+                        "rounded-lg",
                         "text-sm font-medium",
-                        "bg-foreground/[0.04] dark:bg-white/[0.06]",
-                        "text-foreground",
-                        "hover:bg-primary/10 hover:text-primary",
-                        "border border-transparent hover:border-primary/20",
-                        "transition-all duration-200"
+                        "bg-primary text-primary-foreground",
+                        "hover:bg-primary/90",
+                        "shadow-sm hover:shadow-md",
+                        "transition-all duration-200",
+                        "min-h-[40px]"
                       )}
                     >
-                      Подробнее
-                      <ArrowRight className="w-4 h-4" />
+                      <MessageCircle className="w-4 h-4" />
+                      Обсудить
                     </Link>
                   </div>
                 </motion.div>

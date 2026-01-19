@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { MessageCircle, ArrowDown, Home } from "lucide-react";
 import { cn, scrollToElement } from "@/lib/utils";
+import { Container } from "@/components/common/Container";
 
 interface ProductHeroCompactProps {
   badge: string;
@@ -36,28 +37,31 @@ export function ProductHeroCompact({
   };
 
   return (
-    <section className="pt-24 pb-8 md:pt-28 lg:pt-32 md:pb-12">
-      <div className="container max-w-4xl mx-auto px-4">
+    <section className="pt-20 pb-8 md:pt-24 lg:pt-28 md:pb-12">
+      <Container className="py-3 md:py-4">
         {/* Breadcrumb */}
         <motion.nav
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex items-center gap-2 text-sm text-muted-foreground mb-6"
+          className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground"
         >
           <Link
             to="/"
             className="hover:text-foreground transition-colors flex items-center gap-1"
           >
-            <Home className="w-3.5 h-3.5" />
+            <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
           </Link>
           <span className="text-muted-foreground/50">/</span>
           <Link to="/products" className="hover:text-foreground transition-colors">
             Каталог
           </Link>
           <span className="text-muted-foreground/50">/</span>
-          <span className="text-foreground font-medium">{title}</span>
+          <span className="text-foreground font-medium truncate">{title}</span>
         </motion.nav>
+      </Container>
+      
+      <div className="container max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Badge */}
         <motion.div

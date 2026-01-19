@@ -13,7 +13,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", size = "md", children, asChild, ...props }, ref) => {
     const shouldReduceMotion = usePrefersReducedMotion();
     
-    const baseStyles = "inline-flex items-center justify-center rounded-2xl font-medium transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none";
+    const baseStyles = "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:pointer-events-none min-h-[40px]";
     
     const variants = {
       primary: "bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-[0_0_30px_rgba(122,162,255,0.4)] active:scale-95",
@@ -23,9 +23,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizes = {
-      sm: "h-9 px-4 text-sm",
-      md: "h-11 px-6 text-base",
-      lg: "h-14 px-8 text-lg",
+      sm: "h-9 px-3.5 text-sm",
+      md: "h-10 px-5 text-sm",
+      lg: "h-12 px-7 text-base",
     };
 
     const MotionButton = motion.button as any;

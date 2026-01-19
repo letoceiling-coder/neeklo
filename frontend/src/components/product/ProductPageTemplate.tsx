@@ -70,17 +70,17 @@ export const ProductPageTemplate = ({ data }: ProductPageTemplateProps) => {
   return (
     <div className="min-h-screen bg-background pt-20">
       {/* Breadcrumbs */}
-      <Container className="py-4">
-        <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+      <Container className="py-3 md:py-4">
+        <nav className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground">
           <Link to="/" className="hover:text-foreground transition-colors flex items-center gap-1">
-            <Home className="w-4 h-4" />
+            <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
           </Link>
-          <span>/</span>
+          <span className="text-muted-foreground/50">/</span>
           <Link to="/products" className="hover:text-foreground transition-colors">
             Каталог
           </Link>
-          <span>/</span>
-          <span className="text-foreground font-medium">{data.title}</span>
+          <span className="text-muted-foreground/50">/</span>
+          <span className="text-foreground font-medium truncate">{data.title}</span>
         </nav>
       </Container>
 

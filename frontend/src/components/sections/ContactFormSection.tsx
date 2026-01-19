@@ -148,11 +148,11 @@ export const ContactFormSection = () => {
               href="https://t.me/neeklo"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full py-4 px-6 rounded-2xl
-                bg-gradient-to-r from-[#0088cc] to-[#00a8e8] text-white font-semibold
-                hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-lg
+                bg-gradient-to-r from-[#0088cc] to-[#00a8e8] text-white font-medium text-sm
+                hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 min-h-[40px]"
             >
-              <MessageCircle className="w-5 h-5" />
+              <MessageCircle className="w-4 h-4" />
               Написать в Telegram
             </a>
 

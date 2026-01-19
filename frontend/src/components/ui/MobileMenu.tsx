@@ -96,9 +96,9 @@ export const MobileMenu = ({ isOpen, onClose, navItems, isActive }: MobileMenuPr
               <a href="https://t.me/neeklo" target="_blank" rel="noopener noreferrer" className="block">
                 <motion.button
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className="w-full py-4 px-6 rounded-xl font-medium text-base transition-all duration-300 bg-gradient-to-r from-primary to-accent text-primary-foreground flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full py-3 px-5 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-accent text-primary-foreground flex items-center justify-center gap-2 shadow-lg min-h-[40px]"
                 >
-                  <MessageCircle className="w-5 h-5" />
+                  <MessageCircle className="w-4 h-4" />
                   Обсудить проект
                 </motion.button>
               </a>

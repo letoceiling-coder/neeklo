@@ -4,7 +4,7 @@ import { memo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Container } from "@/components/common/Container";
-import { ArrowRight, Globe, Bot, Video, Smartphone, LucideIcon } from "lucide-react";
+import { ArrowRight, Globe, Bot, Video, Smartphone, LucideIcon, Currency, Clock, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useMobile } from "@/hooks/useMobile";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -82,73 +82,73 @@ const SolutionCard = memo(function SolutionCard({
         to={solution.href}
         className={cn(
           "group flex flex-col h-full cursor-pointer",
-          "rounded-[20px] lg:rounded-[28px]",
-          "p-5 md:p-6",
-          // Glass UI style
-          "bg-foreground/[0.02] dark:bg-white/[0.035]",
-          "backdrop-blur-xl",
-          "border border-foreground/[0.06] dark:border-white/[0.06]",
-          // Hover effects
+          "rounded-xl",
+          "p-6 md:p-8",
+          "bg-background",
+          "border border-border/50",
+          "shadow-md hover:shadow-lg",
           "transition-all duration-300",
-          "hover:bg-foreground/[0.04] dark:hover:bg-white/[0.05]",
-          "hover:border-foreground/[0.12] dark:hover:border-white/[0.12]",
-          !isMobile && "hover:-translate-y-1",
+          !isMobile && "hover:-translate-y-2 hover:shadow-xl",
           "active:scale-[0.98]",
-          "min-h-[180px] md:min-h-[200px]",
+          "min-h-[240px] md:min-h-[260px]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         )}
       >
         {/* Icon + Title */}
-        <div className="flex items-start gap-3 mb-4">
+        <div className="flex items-start gap-4 mb-6">
           <div className={cn(
             "flex-shrink-0",
-            "w-10 h-10 md:w-11 md:h-11",
+            "w-12 h-12 md:w-14 md:h-14",
             "rounded-xl",
-            "bg-primary/10 dark:bg-primary/15",
+            "bg-primary/10",
             "border border-primary/20",
             "flex items-center justify-center",
-            "group-hover:bg-primary/15 dark:group-hover:bg-primary/20",
+            "group-hover:bg-primary/15",
             "transition-colors duration-200"
           )}>
-            <Icon className="w-5 h-5 md:w-5.5 md:h-5.5 text-primary" strokeWidth={1.5} />
+            <Icon className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={1.5} />
           </div>
           <h3 className={cn(
-            "text-lg md:text-xl font-medium text-foreground pt-1.5",
+            "text-xl md:text-2xl font-semibold text-foreground pt-1",
             "group-hover:text-primary transition-colors duration-200"
           )}>
             {solution.title}
           </h3>
         </div>
 
-        {/* Price + Duration block */}
-        <div className="flex-1 flex flex-col justify-end">
-          <div className="mb-4 space-y-1">
-            {/* Price */}
-            <div className="text-xl md:text-2xl font-bold text-foreground tracking-tight">
+        {/* Price + Duration block with icons */}
+        <div className="flex-1 flex flex-col justify-end space-y-4 mb-6">
+          {/* Price with icon */}
+          <div className="flex items-center gap-2.5">
+            <Currency className="w-5 h-5 text-primary flex-shrink-0" />
+            <span className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
               {solution.price}
-            </div>
-            {/* Duration */}
-            <div className="text-sm text-muted-foreground/80">
+            </span>
+          </div>
+          
+          {/* Duration with icon */}
+          <div className="flex items-center gap-2.5">
+            <Clock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+            <span className="text-base md:text-lg text-muted-foreground">
               {solution.duration}
-            </div>
+            </span>
           </div>
+        </div>
 
-          {/* Visual CTA indicator */}
-          <div className={cn(
-            "inline-flex items-center justify-center gap-2",
-            "w-full py-3 px-4",
-            "rounded-xl",
-            "text-sm font-medium",
-            "bg-foreground/[0.04] dark:bg-white/[0.06]",
-            "border border-foreground/[0.08] dark:border-white/[0.08]",
-            "text-muted-foreground",
-            "group-hover:bg-primary/10 group-hover:border-primary/20",
-            "group-hover:text-foreground",
-            "transition-all duration-200"
-          )}>
-            Подробнее
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-          </div>
+        {/* CTA Button */}
+        <div className={cn(
+          "inline-flex items-center justify-center gap-2",
+          "w-full py-3 px-5",
+          "rounded-lg",
+          "text-sm font-medium",
+          "bg-primary text-primary-foreground",
+          "hover:bg-primary/90",
+          "shadow-sm hover:shadow-md",
+          "transition-all duration-200",
+          "min-h-[40px]"
+        )}>
+          <MessageCircle className="w-4 h-4" />
+          Обсудить
         </div>
       </Link>
     </motion.div>
@@ -219,12 +219,13 @@ export function ReadySolutions() {
             to="/products"
             className={cn(
               "flex items-center justify-center gap-2 w-full",
-              "py-4 px-6 rounded-2xl",
+              "py-3 px-5 rounded-lg",
               "bg-foreground/[0.03] dark:bg-white/[0.035]",
               "border border-foreground/[0.08] dark:border-white/[0.08]",
               "text-sm font-medium text-foreground",
               "hover:bg-foreground/[0.06] dark:hover:bg-white/[0.06]",
-              "transition-all duration-200"
+              "transition-all duration-200",
+              "min-h-[40px]"
             )}
           >
             Все продукты

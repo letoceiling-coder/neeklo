@@ -72,14 +72,17 @@ const WorkDetail = () => {
     <div className="min-h-screen bg-background">
       <StructuredData data={creativeWorkSchema} />
       
-      <main className="pt-24 md:pt-32 pb-16">
-        <Container>
+      <main className="pt-20 md:pt-24 lg:pt-28 pb-16">
+        <Container className="py-3 md:py-4">
           <Breadcrumbs
             items={[
               { label: "Проекты", url: "/work" },
               { label: caseData.title, url: `/work/${caseData.slug}` },
             ]}
           />
+        </Container>
+        
+        <Container className="pt-0">
 
           {/* Hero Section */}
           <motion.div

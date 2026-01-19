@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Globe, Brain, Video, Clock, ArrowRight, Sparkles } from "lucide-react";
+import { Globe, Brain, Video, Clock, ArrowRight, Sparkles, Currency, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAnimationVariants } from "@/hooks/useScrollAnimation";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -106,7 +106,7 @@ export const Products = memo(function Products() {
           </p>
         </motion.div>
 
-        {/* Products Grid - Modern Cards */}
+        {/* Products Grid - Clean Modern Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {featuredProducts.map((product, index) => {
             const Icon = product.icon;
@@ -114,10 +114,10 @@ export const Products = memo(function Products() {
             return (
               <motion.div
                 key={product.id}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.15, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ delay: index * 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="h-full"
               >
                 <Link 
@@ -126,75 +126,70 @@ export const Products = memo(function Products() {
                 >
                   <motion.div
                     whileHover={prefersReducedMotion ? {} : { 
-                      y: -12,
-                      transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+                      y: -4,
+                      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
                     }}
                     whileTap={{ scale: 0.98 }}
-                    className="relative h-full"
+                    className="relative h-full flex flex-col"
                   >
-                    {/* Glow effect on hover */}
-                    <div className={cn(
-                      "absolute -inset-1 rounded-3xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500",
-                      product.glowColor === "cyan" && "bg-gradient-to-r from-cyan-500/30 to-blue-500/30",
-                      product.glowColor === "purple" && "bg-gradient-to-r from-purple-500/30 to-violet-500/30",
-                      product.glowColor === "pink" && "bg-gradient-to-r from-pink-500/30 to-purple-500/30",
-                    )} />
-                    
                     {/* Card */}
                     <div className={cn(
-                      "relative h-full rounded-2xl md:rounded-3xl p-6 md:p-8 transition-all duration-500",
-                      "bg-gradient-to-br",
-                      product.gradient,
-                      "shadow-lg hover:shadow-2xl",
-                      "flex flex-col overflow-hidden"
+                      "relative h-full rounded-xl p-6 md:p-8 transition-all duration-300",
+                      "bg-background border border-border/50",
+                      "shadow-md hover:shadow-lg",
+                      "flex flex-col"
                     )}>
-                      {/* Background decorations */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10" />
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      
-                      {/* Floating orbs */}
-                      <div className="absolute top-4 right-4 w-20 h-20 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-                      <div className="absolute bottom-4 left-4 w-16 h-16 bg-black/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700" />
-                      
                       {/* Icon */}
-                      <div className="mb-5 relative z-10">
-                        <motion.div 
-                          className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20 group-hover:scale-110 group-hover:bg-white/30 transition-all duration-300"
-                          whileHover={prefersReducedMotion ? {} : { rotate: [0, -5, 5, 0] }}
-                          transition={{ duration: 0.5 }}
-                        >
-                          <Icon className="w-7 h-7 md:w-8 md:h-8 text-white" />
-                        </motion.div>
+                      <div className="mb-6">
+                        <div className={cn(
+                          "w-14 h-14 md:w-16 md:h-16 rounded-xl flex items-center justify-center",
+                          "bg-primary/10 border border-primary/20",
+                          "group-hover:bg-primary/15 transition-colors duration-200"
+                        )}>
+                          <Icon className="w-7 h-7 md:w-8 md:h-8 text-primary" />
+                        </div>
                       </div>
 
                       {/* Title & Description */}
-                      <h3 className="text-xl md:text-2xl font-bold text-white mb-3 relative z-10">
+                      <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3">
                         {product.name}
                       </h3>
-                      <p className="text-sm md:text-base text-white/85 leading-relaxed mb-6 relative z-10 flex-grow">
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed mb-6 flex-grow">
                         {product.description}
                       </p>
 
-                      {/* Pricing & Timeline */}
-                      <div className="flex items-center justify-between gap-3 mb-5 relative z-10">
-                        <div className="text-xl md:text-2xl font-bold text-white">
-                          {product.price}
+                      {/* Price + Timeline with icons */}
+                      <div className="space-y-4 mb-6">
+                        {/* Price with icon */}
+                        <div className="flex items-center gap-2.5">
+                          <Currency className="w-5 h-5 text-primary flex-shrink-0" />
+                          <span className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+                            {product.price}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-sm text-white/90">
-                          <Clock className="w-4 h-4" />
-                          {product.timeline}
+                        
+                        {/* Duration with icon */}
+                        <div className="flex items-center gap-2.5">
+                          <Clock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-base md:text-lg text-muted-foreground">
+                            {product.timeline}
+                          </span>
                         </div>
                       </div>
 
                       {/* CTA Button */}
-                      <motion.div 
-                        className="w-full py-3.5 md:py-4 rounded-xl font-semibold text-sm md:text-base bg-white/20 backdrop-blur-sm text-white transition-all duration-300 flex items-center justify-center gap-2 border border-white/30 relative z-10 group-hover:bg-white/35"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span>Заказать</span>
-                        <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
-                      </motion.div>
+                      <div className={cn(
+                        "w-full py-3 px-5 rounded-lg font-medium text-sm",
+                        "bg-primary text-primary-foreground",
+                        "hover:bg-primary/90",
+                        "shadow-sm hover:shadow-md",
+                        "transition-all duration-200",
+                        "flex items-center justify-center gap-2",
+                        "min-h-[40px]"
+                      )}>
+                        <MessageCircle className="w-4 h-4" />
+                        Обсудить
+                      </div>
                     </div>
                   </motion.div>
                 </Link>
