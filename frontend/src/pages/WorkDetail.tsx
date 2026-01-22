@@ -55,6 +55,18 @@ const WorkDetail = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  // Debug: Log gallery images mapping for batnorton
+  useEffect(() => {
+    if (slug === 'batnorton' && caseData?.gallery) {
+      console.log('BatNorton gallery items:', caseData.gallery);
+      console.log('Gallery images map:', galleryImages);
+      caseData.gallery.forEach(item => {
+        const mappedSrc = galleryImages[item.src];
+        console.log(`Mapping ${item.src} -> ${mappedSrc || 'NOT FOUND'}`);
+      });
+    }
+  }, [slug, caseData]);
+
   if (!caseData) {
     return <Navigate to="/work" replace />;
   }
@@ -237,12 +249,19 @@ const WorkDetail = () => {
           {/* Media Gallery */}
           {caseData.gallery && caseData.gallery.length > 0 && (
             <CaseMediaGallery 
-              items={caseData.gallery.map(item => ({
-                type: item.type as 'image' | 'video',
-                src: galleryImages[item.src] || (item.src.startsWith('/') ? item.src : `/${item.src}`),
-                alt: item.alt,
-                poster: item.type === 'video' ? coverImages[caseData.slug] : undefined
-              }))} 
+              items={caseData.gallery.map(item => {
+                // Get image from galleryImages map or fallback to public path
+                const imageSrc = galleryImages[item.src];
+                if (!imageSrc) {
+                  console.warn(`Gallery image not found: ${item.src}`, galleryImages);
+                }
+                return {
+                  type: item.type as 'image' | 'video',
+                  src: imageSrc || (item.src.startsWith('/') ? item.src : `/${item.src}`),
+                  alt: item.alt,
+                  poster: item.type === 'video' ? coverImages[caseData.slug] : undefined
+                };
+              })} 
               title="Галерея проекта" 
             />
           )}
