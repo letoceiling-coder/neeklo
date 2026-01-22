@@ -178,9 +178,8 @@ const Products = () => {
                       "p-6 md:p-8",
                       "bg-background",
                       "border border-border/50",
-                      "shadow-md hover:shadow-lg",
-                      "transition-all duration-300",
-                      "hover:-translate-y-2 hover:shadow-xl"
+                      "shadow-md",
+                      "card-hover"
                     )}
                   >
                     {/* Category badge */}

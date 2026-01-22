@@ -45,14 +45,13 @@ export const SolutionCard = memo(function SolutionCard({
           "border border-foreground/[0.06] dark:border-white/[0.06]",
           "hover:bg-foreground/[0.06] dark:hover:bg-white/[0.06]",
           "hover:border-foreground/[0.12] dark:hover:border-white/[0.12]",
-          "active:bg-foreground/[0.08] dark:active:bg-white/[0.08]",
-          "transition-all duration-200",
+          "card-hover",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         )}
       >
         <motion.div
-          whileHover={!isMobile ? { y: -4 } : undefined}
-          whileTap={{ scale: 0.97 }}
+          whileHover={!isMobile ? {} : undefined}
+          whileTap={{}}
           className={cn(
             "flex flex-col h-full",
             isMobile ? "p-5 min-h-[130px]" : "p-5 xl:p-6 min-h-[160px]"

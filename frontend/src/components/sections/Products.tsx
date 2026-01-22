@@ -134,9 +134,10 @@ export const Products = memo(function Products() {
                   >
                     {/* Card */}
                     <div className={cn(
-                      "relative h-full rounded-xl p-6 md:p-8 transition-all duration-300",
+                      "relative h-full rounded-xl p-6 md:p-8",
                       "bg-background border border-border/50",
-                      "shadow-md hover:shadow-lg",
+                      "shadow-md",
+                      "card-hover",
                       "flex flex-col"
                     )}>
                       {/* Icon */}

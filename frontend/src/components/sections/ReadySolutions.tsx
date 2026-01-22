@@ -86,10 +86,8 @@ const SolutionCard = memo(function SolutionCard({
           "p-6 md:p-8",
           "bg-background",
           "border border-border/50",
-          "shadow-md hover:shadow-lg",
-          "transition-all duration-300",
-          !isMobile && "hover:-translate-y-2 hover:shadow-xl",
-          "active:scale-[0.98]",
+          "shadow-md",
+          "card-hover",
           "min-h-[240px] md:min-h-[260px]",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         )}

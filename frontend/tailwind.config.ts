@@ -159,6 +159,10 @@ export default {
             backgroundPosition: "350% 50%, 350% 50%",
           },
         },
+        gradient: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -168,6 +172,7 @@ export default {
         "glow": "glow 3s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
         aurora: "aurora 60s linear infinite",
+        gradient: "gradient 8s linear infinite",
       },
       transitionTimingFunction: {
         "smooth": "cubic-bezier(0.4, 0, 0.2, 1)",

@@ -640,3 +640,90 @@ textarea:focus-visible {
 .scroll-touch {
   -webkit-overflow-scrolling: touch;
 }
+
+/* ============================================
+   CARD & BUTTON INTERACTION STYLES
+   Consistent hover/active effects with cyan glow
+   ============================================ */
+
+@layer utilities {
+  /* Card hover effects - subtle upward movement + glow shadow */
+  .card-hover {
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+  }
+
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(34, 211, 238, 0.15);
+  }
+
+  /* Button hover/active effects - scale with soft glow */
+  .button-interactive {
+    transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
+  }
+
+  .button-interactive:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+  }
+
+  .button-interactive:active {
+    transform: scale(0.98);
+  }
+
+  /* Prevent flicker and transform jumps */
+  .card-hover,
+  .button-interactive {
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ============================================
+     SCROLL-TRIGGERED ANIMATIONS
+     Fade-in, stagger, and count-up effects
+     ============================================ */
+
+  /* Initial state for scroll-triggered elements */
+  .scroll-fade,
+  .scroll-stagger > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 600ms cubic-bezier(0.4, 0, 0.2, 1),
+                transform 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
+  }
+
+  /* Animated state - applied when element enters viewport */
+  .animate-fade-in {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Count-up element styling */
+  .scroll-count {
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================
+     GRADIENT TEXT ANIMATION
+     For hero heading gradient animation
+     ============================================ */
+  @keyframes gradient {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .animate-gradient {
+    animation: gradient 8s linear infinite;
+    background-size: 200% auto;
+  }
+}

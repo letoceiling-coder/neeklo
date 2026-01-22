@@ -97,12 +97,12 @@ export const CaseCard = memo(function CaseCard({
     >
       <Link to={`/work/${slug}`}>
         <motion.div
-          whileHover={shouldReduceMotion ? {} : { scale: 1.03, y: -8 }}
+          whileHover={shouldReduceMotion ? {} : {}}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
           onHoverStart={() => setIsHovered(true)}
           onHoverEnd={() => setIsHovered(false)}
         >
-          <Card className="group cursor-pointer relative overflow-hidden p-0 h-full">
+          <Card className="group cursor-pointer relative overflow-hidden p-0 h-full card-hover">
             {/* Image/Video Container */}
             <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
               {/* Skeleton loader */}

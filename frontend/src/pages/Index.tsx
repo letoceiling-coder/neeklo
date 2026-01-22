@@ -1,4 +1,5 @@
-import { CanvasHero } from "@/components/hero/CanvasHero";
+import { HeroSection } from "@/components/hero/HeroSection";
+import { StickyCtaButton } from "@/components/layout/StickyCtaButton";
 import { SkruticSelector } from "@/components/sections/SkruticSelector";
 import { VideoCasesSlider } from "@/components/sections/VideoCasesSlider";
 import { ReadySolutions } from "@/components/sections/ReadySolutions";
@@ -53,8 +54,11 @@ const Index = () => {
       <StructuredData data={organizationSchema} />
       
       <main className="pb-24 lg:pb-0 pt-0">
-        {/* Hero Section - Clean, minimal */}
-        <CanvasHero />
+        {/* Hero Section - Video background with modern design */}
+        <HeroSection />
+        
+        {/* Sticky CTA Button */}
+        <StickyCtaButton />
         
         {/* Video Cases Slider - кейсы, доверие */}
         <section id="cases">

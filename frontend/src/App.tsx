@@ -15,6 +15,7 @@ import { ScrollToTop } from "@/components/common/ScrollToTop";
 import { MobileMenu } from "@/components/ui/MobileMenu";
 import { usePreloadRoutes } from "@/hooks/usePreloadRoutes";
 import { useWebVitals } from "@/hooks/useWebVitals";
+import { useScrollAnimations } from "@/hooks/useScrollAnimations";
 import Index from "./pages/Index";
 
 // Lazy load pages for code splitting
@@ -73,6 +74,7 @@ const NAV_ITEMS = [
 function AppRoutes() {
   usePreloadRoutes();
   useWebVitals();
+  useScrollAnimations(); // Initialize scroll-triggered animations
 
   return (
     <Routes>

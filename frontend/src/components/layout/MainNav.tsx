@@ -1,34 +1,35 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Search, ArrowRight, X } from "lucide-react";
+import { Menu, ArrowUpRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { SearchModal } from "@/components/ui/SearchModal";
 import { useActiveSection } from "@/hooks/useActiveSection";
+import { BriefWizard } from "@/components/hero/BriefWizard";
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-dark.png";
 
-// Desktop nav - simplified: Каталог only
+// Desktop nav - updated navigation
 const navItems = [
-  { label: "Каталог", href: "/products", sectionId: "products" },
+  { label: "Услуги", href: "/products", sectionId: "products" },
   { label: "Кейсы", href: "/work", sectionId: "cases" },
-  { label: "О нас", href: "/about", sectionId: "about" },
+  { label: "Как работаем", href: "/process", sectionId: "process" },
+  { label: "Цены", href: "/products", sectionId: "products" },
 ];
 
 // Burger menu items (includes more pages)
 const burgerMenuItems = [
-  { label: "Каталог", href: "/products" },
+  { label: "Услуги", href: "/products" },
   { label: "Кейсы", href: "/work" },
-  { label: "Процесс", href: "/process" },
+  { label: "Как работаем", href: "/process" },
+  { label: "Цены", href: "/products" },
   { label: "О нас", href: "/about" },
   { label: "Контакты", href: "/contact" },
 ];
 
 export const MainNav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isBriefOpen, setIsBriefOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
@@ -68,12 +69,11 @@ export const MainNav = () => {
   // Close menus on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setIsSearchOpen(false);
   }, [location.pathname]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
-    if (isMobileMenuOpen || isSearchOpen) {
+    if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -81,15 +81,11 @@ export const MainNav = () => {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isMobileMenuOpen, isSearchOpen]);
+  }, [isMobileMenuOpen]);
 
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
       if (e.key === 'Escape') {
         setIsMobileMenuOpen(false);
       }
@@ -177,7 +173,7 @@ export const MainNav = () => {
                   decoding="async"
                   className={cn(
                     "w-auto transition-all duration-500 ease-out",
-                    scrolled ? "h-9 md:h-10" : "h-12 md:h-14 lg:h-16 xl:h-20"
+                    scrolled ? "h-11 md:h-12" : "h-[60px] md:h-[68px] lg:h-20 xl:h-24"
                   )}
                 />
               </motion.div>
@@ -225,41 +221,24 @@ export const MainNav = () => {
             {/* Right Side */}
             <div className={cn(
               "flex items-center flex-shrink-0 transition-all duration-500",
-              scrolled ? "gap-0.5 pr-1" : "gap-2"
+              scrolled ? "gap-2 pr-1" : "gap-3"
             )}>
-              {/* Search */}
-              <motion.button
-                whileHover={shouldReduceMotion ? {} : { scale: 1.05 }}
-                whileTap={shouldReduceMotion ? {} : { scale: 0.95 }}
-                onClick={() => setIsSearchOpen(true)}
-                className={cn(
-                  "flex items-center justify-center rounded-full transition-all duration-200",
-                  "text-foreground/60 hover:text-foreground hover:bg-foreground/5",
-                  scrolled ? "w-8 h-8" : "w-10 h-10"
-                )}
-                aria-label="Поиск (⌘K)"
-              >
-                <Search className={cn("transition-all duration-300", scrolled ? "w-4 h-4" : "w-5 h-5")} />
-              </motion.button>
-
-              {/* Theme Toggle */}
-              <ThemeToggle />
-
               {/* CTA - Desktop */}
-              <Link to="/contact" className="hidden md:block">
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className={cn(
-                    "rounded-full text-sm font-medium transition-all duration-200 flex items-center gap-2",
-                    "bg-foreground text-background hover:bg-foreground/90",
-                    scrolled ? "px-3 py-1.5" : "px-5 py-2.5"
-                  )}
-                >
-                  <span className={scrolled ? "hidden xl:inline" : ""}>Обсудить проект</span>
-                  <ArrowRight className={cn("transition-all", scrolled ? "w-3.5 h-3.5" : "w-4 h-4")} />
-                </motion.button>
-              </Link>
+              <motion.button
+                onClick={() => setIsBriefOpen(true)}
+                whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                className={cn(
+                  "hidden md:flex items-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                  "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black",
+                  "hover:shadow-lg hover:shadow-cyan-500/30",
+                  scrolled ? "px-4 py-2" : "px-6 py-3"
+                )}
+                aria-label="Узнать стоимость проекта"
+              >
+                <span className={scrolled ? "hidden xl:inline" : ""}>Узнать стоимость</span>
+                <ArrowUpRight className={cn("transition-all", scrolled ? "w-4 h-4" : "w-5 h-5")} />
+              </motion.button>
 
               {/* Mobile Menu Button */}
               <button
@@ -278,9 +257,6 @@ export const MainNav = () => {
           </motion.nav>
         </div>
       </header>
-
-      {/* Search Modal */}
-      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -307,7 +283,7 @@ export const MainNav = () => {
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border/20">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                  <img src={currentLogo} alt="Neeklo Studio" loading="lazy" decoding="async" className="h-12" />
+                  <img src={currentLogo} alt="Neeklo Studio" loading="lazy" decoding="async" className="h-[60px]" />
                 </Link>
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -371,18 +347,21 @@ export const MainNav = () => {
 
               {/* CTA */}
               <div className="p-4 border-t border-border/20">
-                <Link
-                  to="/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsBriefOpen(true);
+                  }}
                   className={cn(
-                    "flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-full min-h-[48px]",
-                    "bg-foreground text-background font-medium",
-                    "transition-all duration-200 hover:bg-foreground/90"
+                    "flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-xl min-h-[48px]",
+                    "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-semibold",
+                    "transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/30"
                   )}
+                  aria-label="Узнать стоимость проекта"
                 >
-                  <span>Обсудить проект</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                  <span>Узнать стоимость</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </button>
               </div>
             </motion.div>
           </>
