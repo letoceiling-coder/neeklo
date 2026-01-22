@@ -727,3 +727,48 @@ textarea:focus-visible {
     background-size: 200% auto;
   }
 }
+
+/* ============================================
+   SPLINE WATERMARK HIDING
+   Скрытие watermark "Built with Spline"
+   ============================================ */
+
+/* Глобальное скрытие Spline watermark */
+body [style*="position: fixed"][style*="bottom"][style*="right"] {
+  display: none !important;
+}
+
+a[href*="spline.design"],
+a[href*="spline.tools"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#spline-watermark,
+[id*="spline-watermark"],
+[class*="spline-watermark"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Убрать элементы с fixed позицией внутри Spline контейнера */
+[style*="position: fixed"][style*="bottom"] {
+  display: none !important;
+}
+
+/* Альтернативный селектор если watermark в iframe */
+iframe[src*="spline"] + div,
+canvas + a[href*="spline"] {
+  display: none !important;
+}
+
+/* Скрыть все элементы с текстом "Spline" в правом нижнем углу */
+body > div[style*="position: fixed"][style*="bottom"][style*="right"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}

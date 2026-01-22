@@ -58,7 +58,7 @@ export const MainNav = () => {
   // Scroll tracking
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+      setScrolled(window.scrollY > 50);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -115,52 +115,45 @@ export const MainNav = () => {
 
   return (
     <>
-      {/* Fixed Header Container - ALWAYS fixed at top */}
+      {/* Fixed Header Container - Sticky with offset from top */}
       <header 
-        className="fixed top-0 left-0 right-0 w-full z-[9999]"
-        style={{ position: 'fixed' }}
+        className={cn(
+          "fixed left-1/2 -translate-x-1/2 z-[9999]",
+          "w-[95%] max-w-7xl",
+          "lg:w-[95%] md:w-[97%] sm:w-[98%]",
+          "transition-all duration-500 ease-out",
+          scrolled ? "top-4" : "top-6"
+        )}
         role="navigation"
         aria-label="Главная навигация"
       >
-        {/* Wrapper with dynamic padding */}
-        <div className={cn(
-          "w-full flex justify-center transition-all duration-500 ease-out",
-          scrolled ? "pt-3 px-4" : "pt-0 px-0"
-        )}>
-          {/* Nav Container */}
-          <motion.nav
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ 
-              duration: shouldReduceMotion ? 0 : 0.4, 
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className={cn(
-              "flex items-center justify-between transition-all duration-500 ease-out",
-              scrolled ? [
-                // Scrolled: Compact glass pill
-                "max-w-5xl w-auto",
-                "rounded-full px-3 py-2",
-                "bg-background/95",
-                "backdrop-blur-2xl backdrop-saturate-150",
-                "border border-border/40",
-                "shadow-xl shadow-foreground/5",
-              ] : [
-                // Zero scroll: Full width, solid background
-                "w-full max-w-none",
-                "px-6 md:px-8 lg:px-12 py-4 md:py-5",
-                "bg-background",
-                "rounded-none border-transparent",
-              ]
-            )}
-          >
+        {/* Nav Container with backdrop blur */}
+        <motion.nav
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ 
+            duration: shouldReduceMotion ? 0 : 0.4, 
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className={cn(
+            "flex items-center justify-between transition-all duration-500 ease-out",
+            "bg-black/30 backdrop-blur-xl",
+            "border border-gray-800/50",
+            "rounded-2xl",
+            "shadow-2xl shadow-black/50",
+            scrolled ? [
+              // Scrolled: Compact
+              "px-4 py-2",
+            ] : [
+              // Zero scroll: More padding
+              "px-6 py-3",
+            ]
+          )}
+        >
             {/* Logo */}
             <Link 
               to="/" 
-              className={cn(
-                "relative z-50 flex items-center flex-shrink-0 transition-all duration-500",
-                scrolled ? "pl-2" : "pl-0"
-              )}
+              className="relative z-50 flex items-center flex-shrink-0 transition-all duration-500"
             >
               <motion.div
                 whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
@@ -180,17 +173,14 @@ export const MainNav = () => {
             </Link>
 
             {/* Desktop Navigation - Center */}
-            <nav className={cn(
-              "hidden lg:flex items-center justify-center transition-all duration-500",
-              scrolled ? "mx-4" : "absolute left-1/2 -translate-x-1/2"
-            )}>
+            <nav className="hidden lg:flex items-center justify-center flex-1 transition-all duration-500">
               <ul className="flex items-center gap-1">
                 {navItems.map((item) => (
                   <li key={item.href} className="relative">
                     <Link
                       to={item.href}
                       className={cn(
-                        "relative text-sm font-medium rounded-full transition-all duration-300 ease-out overflow-hidden",
+                        "relative text-base font-medium rounded-full transition-all duration-300 ease-out overflow-hidden",
                         scrolled ? "px-3 py-1.5" : "px-4 py-2",
                         isActive(item.href, item.sectionId) 
                           ? "text-background" 
@@ -229,7 +219,8 @@ export const MainNav = () => {
                 whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                 whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                 className={cn(
-                  "hidden md:flex items-center gap-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                  "hidden md:flex items-center gap-2 rounded-xl font-bold transition-all duration-200",
+                  "text-base md:text-lg",
                   "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black",
                   "hover:shadow-lg hover:shadow-cyan-500/30",
                   scrolled ? "px-4 py-2" : "px-6 py-3"
@@ -255,7 +246,6 @@ export const MainNav = () => {
               </button>
             </div>
           </motion.nav>
-        </div>
       </header>
 
       {/* Mobile Menu */}
@@ -332,7 +322,7 @@ export const MainNav = () => {
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
                           "block px-4 py-3 rounded-xl min-h-[48px] flex items-center",
-                          "text-base font-medium transition-all duration-200",
+                          "text-base md:text-lg font-medium transition-all duration-200",
                           location.pathname === item.href
                             ? "bg-foreground text-background"
                             : "text-foreground hover:bg-foreground/5 active:scale-[0.98]"
@@ -354,7 +344,8 @@ export const MainNav = () => {
                   }}
                   className={cn(
                     "flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-xl min-h-[48px]",
-                    "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-semibold",
+                    "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-bold",
+                    "text-base md:text-lg",
                     "transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/30"
                   )}
                   aria-label="Узнать стоимость проекта"

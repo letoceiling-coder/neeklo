@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Container } from "@/components/common/Container";
-import { toast } from "sonner";
-import { sendTelegramMessage } from "@/lib/api";
-import { Send, Loader2, Check, Sparkles } from "lucide-react";
-import Confetti from "@/components/ui/confetti";
+import { Send, Check } from "lucide-react";
 
 interface ProductCTAFormProps {
   title?: string;
@@ -24,69 +21,24 @@ export const ProductCTAForm = ({
   telegramLink = "https://t.me/neeklo",
 }: ProductCTAFormProps) => {
   const [formData, setFormData] = useState({
-    name: "",
-    contact: "",
     package: selectedPackage || packages[0]?.id || "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const trimmedName = formData.name.trim();
-    const trimmedContact = formData.contact.trim();
+    const selectedPkg = packages.find((p) => p.id === formData.package);
     
-    if (!trimmedName || trimmedName.length < 2) {
-      toast.error("Введите имя (минимум 2 символа)");
-      return;
-    }
+    // Format message for Telegram
+    const message = `Продукт: ${productName}\nПакет: ${selectedPkg?.name || "Не выбран"}`;
+    const encodedMessage = encodeURIComponent(message);
     
-    // Validate contact - phone or telegram
-    const isValidPhone = /^[\+]?[\d\s\-\(\)]{5,30}$/.test(trimmedContact);
-    const isValidTelegram = /^@?[a-zA-Z0-9_]{3,32}$/.test(trimmedContact);
-    
-    if (!trimmedContact || (!isValidPhone && !isValidTelegram)) {
-      toast.error("Введите корректный телефон или Telegram");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const selectedPkg = packages.find((p) => p.id === formData.package);
-      
-      const result = await sendTelegramMessage({
-        name: formData.name,
-        phone: formData.contact,
-        email: "",
-        role: "Клиент",
-        description: `Продукт: ${productName}\nПакет: ${selectedPkg?.name || "Не выбран"}`,
-      });
-
-      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
-
-      toast.success("Заявка отправлена! Свяжемся в ближайшее время");
-      setIsSuccess(true);
-      setShowConfetti(true);
-      setFormData({ name: "", contact: "", package: packages[0]?.id || "" });
-      
-      setTimeout(() => {
-        setIsSuccess(false);
-        setShowConfetti(false);
-      }, 3000);
-    } catch (error) {
-      console.error("Error submitting form:", error);
-      toast.error("Ошибка отправки. Попробуйте написать в Telegram");
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Redirect to Telegram
+    window.open(`https://t.me/neeekn?text=${encodedMessage}`, '_blank');
   };
 
   return (
     <>
-      <Confetti isActive={showConfetti} />
       <section className="py-10 sm:py-12 md:py-16">
       <Container>
         <motion.div
@@ -163,61 +115,14 @@ export const ProductCTAForm = ({
                 </div>
               </div>
 
-              {/* Name Input */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Ваше имя
-                </label>
-                <input
-                  type="text"
-                  placeholder="Как вас зовут?"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full h-12 md:h-14 px-4 bg-background/80 border-2 border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-background transition-all"
-                />
-              </div>
-
-              {/* Contact Input */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Телефон или Telegram
-                </label>
-                <input
-                  type="text"
-                  placeholder="+7 (999) 123-45-67 или @username"
-                  value={formData.contact}
-                  onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                  className="w-full h-12 md:h-14 px-4 bg-background/80 border-2 border-border/50 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-background transition-all"
-                />
-              </div>
-
-              {/* Submit Button - Game Style */}
+              {/* Submit Button - Direct Telegram Link */}
               <motion.button
                 type="submit"
-                disabled={isSubmitting || isSuccess}
                 whileTap={{ scale: 0.98 }}
-                className={`w-full h-12 md:h-14 rounded-xl font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2 ${
-                  isSuccess
-                    ? "bg-success text-success-foreground shadow-glow-success"
-                    : "bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02]"
-                } disabled:opacity-70 disabled:cursor-not-allowed`}
+                className="w-full h-12 md:h-14 rounded-xl font-semibold text-base transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl hover:scale-[1.02]"
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    Отправка...
-                  </>
-                ) : isSuccess ? (
-                  <>
-                    <Check size={18} />
-                    Заявка отправлена!
-                  </>
-                ) : (
-                  <>
-                    <Send size={18} />
-                    Обсудить проект
-                  </>
-                )}
+                <Send size={18} />
+                Обсудить проект
               </motion.button>
             </form>
 

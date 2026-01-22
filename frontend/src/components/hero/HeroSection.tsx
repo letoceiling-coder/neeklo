@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { AnimatedBackground } from './AnimatedBackground';
+import { SplineBackground } from './SplineBackground';
 import { BriefWizard } from './BriefWizard';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 export function HeroSection() {
   const [isBriefOpen, setIsBriefOpen] = useState(false);
+  const [scrollOpacity, setScrollOpacity] = useState(1);
   const shouldReduceMotion = usePrefersReducedMotion();
 
   const handleCtaClick = () => {
@@ -18,6 +19,32 @@ export function HeroSection() {
     casesSection?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Fade-out эффект при скролле
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      
+      // Fade out начинается сразу, заканчивается на 50% высоты экрана
+      const fadeStart = 0;
+      const fadeEnd = windowHeight * 0.5;
+      
+      if (scrollPosition <= fadeStart) {
+        setScrollOpacity(1);
+      } else if (scrollPosition >= fadeEnd) {
+        setScrollOpacity(0);
+      } else {
+        const opacity = 1 - (scrollPosition - fadeStart) / (fadeEnd - fadeStart);
+        setScrollOpacity(opacity);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Вызвать сразу для начального состояния
+    
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const fadeInUp = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -26,17 +53,23 @@ export function HeroSection() {
 
   return (
     <>
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-        {/* Animated background */}
-        <AnimatedBackground />
-        
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-black/95" />
+      <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black">
+        {/* 3D Spline Background */}
+        <SplineBackground />
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-6 text-center flex flex-col items-center justify-center min-h-screen">
-          {/* Main content */}
-          <div className="flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto">
+        <div 
+          className="relative z-10 w-full h-screen flex items-start justify-center 
+                     px-6 sm:px-8 md:px-12 lg:px-16 text-center pointer-events-none
+                     transition-opacity duration-100 ease-out pt-24 sm:pt-28 md:pt-32"
+          style={{
+            opacity: scrollOpacity,
+            transform: `translateY(${(1 - scrollOpacity) * -20}px)`,
+            transition: 'opacity 0.1s ease-out, transform 0.1s ease-out'
+          }}
+        >
+          
+          <div className="flex flex-col items-center justify-start max-w-6xl w-full text-center mt-0">
             {/* Main headline */}
             <motion.h1
               initial={shouldReduceMotion ? {} : fadeInUp.initial}
@@ -46,15 +79,13 @@ export function HeroSection() {
                   ? {}
                   : { ...fadeInUp.transition, delay: 0.3 }
               }
-              className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl 
-                         font-bold leading-tight mb-8"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 
+                         font-extrabold leading-[1.1] tracking-tight text-white
+                         drop-shadow-[0_4px_20px_rgba(0,0,0,1)] mb-6"
             >
-              <span className="bg-gradient-to-r from-white via-gray-100 to-white 
-                             bg-clip-text text-transparent">
-                Создание сайтов,{' '}
-                <br className="hidden md:block" />
-                Mini App и AI видео
-              </span>
+              Создание сайтов,{' '}
+              <br className="hidden md:block" />
+              Mini App и AI видео
             </motion.h1>
 
             {/* Subtitle */}
@@ -66,7 +97,10 @@ export function HeroSection() {
                   ? {}
                   : { duration: 0.6, delay: 0.5 }
               }
-              className="text-lg md:text-xl lg:text-2xl text-[#a3a3a3] mb-12 max-w-2xl"
+              className="text-base sm:text-lg md:text-xl lg:text-2xl 
+                         text-white font-medium leading-relaxed
+                         drop-shadow-[0_4px_16px_rgba(0,0,0,1)]
+                         max-w-3xl mx-auto mb-10"
             >
               Разрабатываем продукты, которые приносят деньги
             </motion.p>
@@ -80,17 +114,20 @@ export function HeroSection() {
                   ? {}
                   : { duration: 0.6, delay: 0.7 }
               }
-              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-8 
+                         pointer-events-auto w-full sm:w-auto max-w-sm sm:max-w-none mx-auto"
             >
               {/* Primary CTA */}
               <button
                 onClick={handleCtaClick}
-                className="group relative px-8 py-4 rounded-xl font-semibold text-base
-                           bg-gradient-to-r from-cyan-400 to-cyan-500 text-black
+                className="group relative w-full sm:w-auto px-10 py-5 rounded-xl font-bold
+                           text-lg md:text-xl
+                           bg-gradient-to-r from-cyan-400 to-cyan-500 text-white
                            shadow-lg shadow-cyan-500/50 
                            hover:shadow-xl hover:shadow-cyan-500/60
                            hover:scale-105 active:scale-95
                            transition-all duration-200 overflow-hidden
+                           [text-shadow:_0_1px_2px_rgba(0,0,0,0.3)]
                            focus-visible:outline-none focus-visible:ring-2 
                            focus-visible:ring-cyan-400 focus-visible:ring-offset-2 
                            focus-visible:ring-offset-black"
@@ -113,9 +150,11 @@ export function HeroSection() {
               {/* Secondary CTA */}
               <button
                 onClick={scrollToCases}
-                className="group px-8 py-4 rounded-xl font-semibold text-base
+                className="group w-full sm:w-auto px-10 py-5 rounded-xl font-semibold
+                           text-lg md:text-xl
+                           bg-black/30 backdrop-blur-md
                            border-2 border-[#404040] text-white
-                           hover:border-cyan-400 hover:bg-cyan-400/5
+                           hover:border-cyan-400 hover:bg-cyan-400/10
                            transition-all duration-300
                            focus-visible:outline-none focus-visible:ring-2 
                            focus-visible:ring-cyan-400 focus-visible:ring-offset-2 

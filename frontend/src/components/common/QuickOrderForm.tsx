@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, Loader2, Check, Globe, MessageSquare, Video, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { sendTelegramMessage } from "@/lib/api";
+// Removed unused import - redirecting directly to Telegram
 import { toast } from "@/hooks/use-toast";
 
 const products = [
@@ -50,7 +50,7 @@ export const QuickOrderForm = ({ isOpen, onClose, preselectedProduct }: QuickOrd
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!selectedProduct) {
@@ -62,72 +62,16 @@ export const QuickOrderForm = ({ isOpen, onClose, preselectedProduct }: QuickOrd
       return;
     }
 
-    // Validate name
-    const trimmedName = name.trim();
-    if (!trimmedName || trimmedName.length < 2 || trimmedName.length > 100) {
-      toast({
-        title: "Введите имя",
-        description: "Имя должно содержать от 2 до 100 символов",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate contact - must be phone or telegram
-    const trimmedContact = contact.trim();
-    const isValidPhone = /^[\+]?[0-9\s\-\(\)]{7,20}$/.test(trimmedContact);
-    const isValidTelegram = /^@?[a-zA-Z0-9_]{3,32}$/.test(trimmedContact);
+    const productName = products.find((p) => p.id === selectedProduct)?.name || selectedProduct;
+    const sanitizedComment = comment.trim().replace(/<[^>]*>/g, '').slice(0, 500);
     
-    if (!trimmedContact || (!isValidPhone && !isValidTelegram)) {
-      toast({
-        title: "Введите контакт",
-        description: "Укажите корректный телефон (+7...) или Telegram (@username)",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      const productName = products.find((p) => p.id === selectedProduct)?.name || selectedProduct;
-      
-      // Sanitize comment - remove HTML and limit length
-      const sanitizedComment = comment.trim()
-        .replace(/<[^>]*>/g, '')
-        .slice(0, 500);
-
-      const result = await sendTelegramMessage({
-        name: trimmedName.slice(0, 100),
-        phone: trimmedContact.slice(0, 50),
-        description: `🛒 Быстрый заказ: ${productName}${sanitizedComment ? `\n\n💬 Комментарий: ${sanitizedComment}` : ""}`,
-        role: "Быстрый заказ",
-      });
-
-      if (!result.success) throw new Error(result.message || 'Ошибка отправки');
-
-      setIsSuccess(true);
-      
-      // Reset after delay
-      setTimeout(() => {
-        setIsSuccess(false);
-        setSelectedProduct("");
-        setName("");
-        setContact("");
-        setComment("");
-        onClose();
-      }, 2000);
-
-    } catch (error: any) {
-      console.error("Order error:", error);
-      toast({
-        title: "Ошибка отправки",
-        description: "Попробуйте ещё раз или напишите в Telegram",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Format message for Telegram
+    const message = `🛒 Быстрый заказ: ${productName}${sanitizedComment ? `\n\n💬 Комментарий: ${sanitizedComment}` : ""}`;
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Close modal and redirect to Telegram
+    onClose();
+    window.open(`https://t.me/neeekn?text=${encodedMessage}`, '_blank');
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
