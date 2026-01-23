@@ -118,6 +118,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    outDir: '../public/frontend',
+    emptyOutDir: true,
     minify: 'esbuild',
     target: 'es2020',
     rollupOptions: {
