@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Container } from "@/components/common/Container";
-import { Sparkles, ArrowRight, RotateCcw, ExternalLink } from "lucide-react";
+import { Sparkles, ArrowRight, RotateCcw, ExternalLink, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -25,11 +26,10 @@ interface ProductRecommendation {
   telegramLink: string;
 }
 
-// Product mapping based on selections
+// Product mapping based on selections (logic unchanged)
 const getRecommendation = (selection: Selection): ProductRecommendation => {
   const { what, why } = selection;
 
-  // Website recommendations
   if (what === "site") {
     if (why === "leads" || why === "sales") {
       return {
@@ -51,7 +51,6 @@ const getRecommendation = (selection: Selection): ProductRecommendation => {
     };
   }
 
-  // Bot recommendations
   if (what === "bot") {
     if (why === "automation") {
       return {
@@ -73,7 +72,6 @@ const getRecommendation = (selection: Selection): ProductRecommendation => {
     };
   }
 
-  // Video recommendations
   if (what === "video") {
     if (why === "sales") {
       return {
@@ -95,7 +93,6 @@ const getRecommendation = (selection: Selection): ProductRecommendation => {
     };
   }
 
-  // Default: don't know - show catalog or AI agent
   return {
     slug: "ai-agent",
     title: "AI-ассистент",
@@ -106,7 +103,6 @@ const getRecommendation = (selection: Selection): ProductRecommendation => {
   };
 };
 
-// Step configs
 const steps = {
   1: {
     title: "Что хотите сделать?",
@@ -135,8 +131,20 @@ const steps = {
   },
 };
 
+const getProgress = (s: Step): number => {
+  if (s === 1) return 33;
+  if (s === 2) return 66;
+  return 100;
+};
+
+const getStepLabel = (s: Step): string => {
+  if (s === "result") return "Рекомендация";
+  return `Шаг ${s} из 3`;
+};
+
 export function SkruticSelector() {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<Step>(1);
   const [selection, setSelection] = useState<Selection>({
     what: null,
@@ -145,20 +153,21 @@ export function SkruticSelector() {
   });
 
   const recommendation = useMemo(() => {
-    if (step === "result") {
-      return getRecommendation(selection);
-    }
+    if (step === "result") return getRecommendation(selection);
     return null;
   }, [step, selection]);
+
+  const liveEstimate = useMemo(
+    () => getRecommendation(selection),
+    [selection]
+  );
+
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const handleSelect = (stepNum: 1 | 2 | 3, value: string) => {
     if (stepNum === 1) {
       setSelection((prev) => ({ ...prev, what: value }));
-      if (value === "unknown") {
-        setStep("result");
-      } else {
-        setStep(2);
-      }
+      setStep(value === "unknown" ? "result" : 2);
     } else if (stepNum === 2) {
       setSelection((prev) => ({ ...prev, why: value }));
       setStep(3);
@@ -168,15 +177,17 @@ export function SkruticSelector() {
     }
   };
 
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setStep(1);
     setSelection({ what: null, why: null, when: null });
-  };
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
   const handleViewProduct = () => {
-    if (recommendation) {
-      navigate(`/products/${recommendation.slug}`);
-    }
+    if (recommendation) navigate(`/products/${recommendation.slug}`);
   };
 
   const handleOpenTelegram = () => {
@@ -188,7 +199,34 @@ export function SkruticSelector() {
     }
   };
 
-  const renderStepContent = () => {
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // ESC to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") handleClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, handleClose]);
+
+  // Focus close button when modal opens (for keyboard nav)
+  useEffect(() => {
+    if (isOpen) {
+      const t = setTimeout(() => closeBtnRef.current?.focus(), 80);
+      return () => clearTimeout(t);
+    }
+  }, [isOpen]);
+
+  const renderModalContent = () => {
     if (step === "result" && recommendation) {
       return (
         <motion.div
@@ -197,16 +235,15 @@ export function SkruticSelector() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="text-center space-y-5"
+          className="text-center space-y-6 px-4"
         >
-          {/* Recommendation header */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
-            className="space-y-1"
+            className="space-y-2"
           >
-            <p className="text-xs uppercase tracking-wider text-primary font-medium">
+            <p className="text-xs uppercase tracking-wider text-cyan-400 font-medium">
               Рекомендуем
             </p>
             <h3 className="text-xl md:text-2xl font-bold text-foreground">
@@ -217,38 +254,20 @@ export function SkruticSelector() {
             </p>
           </motion.div>
 
-          {/* Price & timeline */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.3 }}
-            className="flex items-center justify-center gap-3 text-sm"
-          >
-            <span className="text-lg font-semibold text-foreground">
-              {recommendation.price}
-            </span>
-            <span className="text-muted-foreground">·</span>
-            <span className="text-muted-foreground">
-              {recommendation.timeline}
-            </span>
-          </motion.div>
-
-          {/* Action buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.3 }}
             className="flex flex-col sm:flex-row gap-3 justify-center pt-2"
           >
             <button
               onClick={handleOpenTelegram}
               className={cn(
                 "inline-flex items-center justify-center gap-2",
-                "px-6 py-3 rounded-xl",
-                "bg-primary text-primary-foreground",
-                "font-medium text-sm",
-                "hover:bg-primary/90 transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                "px-6 py-3.5 rounded-xl min-h-[48px]",
+                "bg-cyan-400 text-black font-medium text-sm",
+                "hover:bg-cyan-300 transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               )}
             >
               Открыть в Telegram
@@ -258,11 +277,10 @@ export function SkruticSelector() {
               onClick={handleViewProduct}
               className={cn(
                 "inline-flex items-center justify-center gap-2",
-                "px-5 py-3 rounded-xl",
-                "bg-foreground/5 dark:bg-white/10 text-foreground",
-                "font-medium text-sm",
-                "hover:bg-foreground/10 dark:hover:bg-white/15 transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
+                "px-5 py-3.5 rounded-xl min-h-[48px]",
+                "bg-zinc-800 text-foreground font-medium text-sm border border-zinc-600/50",
+                "hover:bg-zinc-700 transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
               )}
             >
               Подробнее
@@ -270,15 +288,14 @@ export function SkruticSelector() {
             </button>
           </motion.div>
 
-          {/* Reset button */}
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.3 }}
             onClick={handleReset}
-            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors mt-2"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            <RotateCcw className="w-3 h-3" />
+            <RotateCcw className="w-3.5 h-3.5" />
             Начать заново
           </motion.button>
         </motion.div>
@@ -295,120 +312,192 @@ export function SkruticSelector() {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.25 }}
-        className="text-center space-y-5"
+        className="space-y-6 px-4"
       >
-        {/* Step title */}
-        <motion.h3
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-lg md:text-xl font-semibold text-foreground"
-        >
+        <h3 className="text-lg md:text-xl font-semibold text-foreground text-center">
           {currentStep.title}
-        </motion.h3>
+        </h3>
 
-        {/* Options grid */}
         <div
           className={cn(
-            "grid gap-3",
-            step === 3 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"
+            "grid gap-4 max-w-md mx-auto",
+            step === 3 ? "grid-cols-2" : "grid-cols-2"
           )}
         >
           {currentStep.options.map((option, index) => (
             <motion.button
               key={option.id}
-              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: index * 0.06, duration: 0.25 }}
+              transition={{ delay: index * 0.05, duration: 0.25 }}
               onClick={() => handleSelect(step as 1 | 2 | 3, option.id)}
-              whileTap={{ scale: 0.96 }}
-              whileHover={{ scale: 1.02, y: -2 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               className={cn(
-                "flex flex-col items-center justify-center gap-2",
-                "p-4 md:p-5 rounded-2xl",
-                "bg-foreground/[0.03] dark:bg-white/[0.05]",
-                "border border-foreground/[0.08] dark:border-white/[0.08]",
-                "hover:bg-primary/10 hover:border-primary/30",
-                "transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                "group cursor-pointer"
+                "flex flex-col items-center justify-center gap-3",
+                "min-h-[120px] md:min-h-[140px] p-5 rounded-2xl",
+                "bg-zinc-800/80 border border-zinc-600/50",
+                "hover:bg-zinc-700/80 hover:border-cyan-400/30",
+                "transition-colors duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950",
+                "cursor-pointer"
               )}
             >
-              <span className="text-2xl md:text-3xl">{option.emoji}</span>
-              <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+              <span className="text-3xl md:text-4xl" role="img" aria-hidden>
+                {option.emoji}
+              </span>
+              <span className="text-sm font-medium text-foreground">
                 {option.label}
               </span>
             </motion.button>
           ))}
         </div>
-
-        {/* Progress indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
-          className="flex items-center justify-center gap-1.5 pt-2"
-        >
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={cn(
-                "w-2 h-2 rounded-full transition-colors duration-200",
-                s === step
-                  ? "bg-primary"
-                  : s < (step as number)
-                  ? "bg-primary/40"
-                  : "bg-foreground/10 dark:bg-white/10"
-              )}
-            />
-          ))}
-        </motion.div>
       </motion.div>
     );
   };
 
   return (
-    <section className="py-8 md:py-12 relative overflow-hidden">
-      <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.4 }}
-          className="max-w-lg mx-auto"
-        >
-          {/* Glass card */}
-          <div
-            className={cn(
-              "relative p-6 md:p-8",
-              "rounded-3xl",
-              "bg-foreground/[0.02] dark:bg-white/[0.03]",
-              "border border-foreground/[0.06] dark:border-white/[0.06]",
-              "backdrop-blur-sm"
-            )}
+    <>
+      {/* CTA section: launch quiz */}
+      <section className="py-8 md:py-12 relative overflow-hidden">
+        <Container>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
+            className="max-w-lg mx-auto"
           >
-            {/* Scrootie badge */}
-            <div className="flex items-center justify-center gap-2 mb-5">
-              <div
+            <button
+              onClick={() => setIsOpen(true)}
+              className={cn(
+                "w-full text-left p-6 md:p-8 rounded-3xl",
+                "bg-foreground/[0.02] dark:bg-white/[0.03]",
+                "border border-foreground/[0.06] dark:border-white/[0.06]",
+                "backdrop-blur-sm",
+                "hover:bg-foreground/[0.04] dark:hover:bg-white/[0.05] hover:border-foreground/[0.1]",
+                "transition-all duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              )}
+            >
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <div
+                  className={cn(
+                    "w-8 h-8 rounded-xl",
+                    "bg-primary/10 dark:bg-primary/15",
+                    "border border-primary/20",
+                    "flex items-center justify-center"
+                  )}
+                >
+                  <Sparkles className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  Скрутик
+                </span>
+              </div>
+              <p className="text-foreground font-semibold text-center mb-2">
+                Подберём решение за 3 вопроса
+              </p>
+              <p className="text-sm text-muted-foreground text-center mb-4">
+                Ответьте на короткий квиз — получите рекомендацию и ориентир по стоимости.
+              </p>
+              <span
                 className={cn(
-                  "w-8 h-8 rounded-xl",
-                  "bg-primary/10 dark:bg-primary/15",
-                  "border border-primary/20",
-                  "flex items-center justify-center"
+                  "inline-flex items-center justify-center gap-2",
+                  "px-5 py-2.5 rounded-xl",
+                  "bg-primary/10 text-primary font-medium text-sm",
+                  "group-hover:bg-primary/15"
                 )}
               >
-                <Sparkles className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                Скрутик
+                Начать
+                <ArrowRight className="w-4 h-4" />
               </span>
+            </button>
+          </motion.div>
+        </Container>
+      </section>
+
+      {/* Fullscreen modal — рендер в body, выше хедера (z-[9999]) */}
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[10000] flex flex-col bg-zinc-950"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="skrutic-title"
+          >
+            {/* Sticky top bar */}
+            <div className="sticky top-0 z-10 flex-shrink-0 bg-zinc-950/95 backdrop-blur-md border-b border-zinc-800/50 safe-area-top">
+              <div className="flex items-center justify-between px-4 py-4 md:px-6">
+                <div>
+                  <p
+                    id="skrutic-title"
+                    className="text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
+                    {getStepLabel(step)}
+                  </p>
+                  {/* Progress bar */}
+                  <div className="mt-2 h-1 w-32 md:w-40 rounded-full bg-zinc-800 overflow-hidden">
+                    <motion.div
+                      className="h-full bg-cyan-400 rounded-full"
+                      initial={{ width: "0%" }}
+                      animate={{ width: getProgress(step) + "%" }}
+                      transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    />
+                  </div>
+                </div>
+                <button
+                  ref={closeBtnRef}
+                  onClick={handleClose}
+                  className={cn(
+                    "p-2.5 rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center",
+                    "text-muted-foreground hover:text-foreground hover:bg-zinc-800",
+                    "transition-colors",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
+                  )}
+                  aria-label="Закрыть"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
-            {/* Step content with animation */}
-            <AnimatePresence mode="wait">{renderStepContent()}</AnimatePresence>
-          </div>
-        </motion.div>
-      </Container>
-    </section>
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center py-8 md:py-12">
+              <AnimatePresence mode="wait">
+                {renderModalContent()}
+              </AnimatePresence>
+            </div>
+
+            {/* Fixed bottom: live estimate */}
+            <div
+              className={cn(
+                "flex-shrink-0 w-full",
+                "bg-zinc-900 border-t border-zinc-800/50",
+                "px-4 py-4 md:px-6 md:py-5 safe-area-bottom"
+              )}
+            >
+              <div className="max-w-lg mx-auto flex items-center justify-center gap-2 text-sm">
+                <span className="font-semibold text-foreground">
+                  {liveEstimate.price}
+                </span>
+                <span className="text-muted-foreground">·</span>
+                <span className="text-muted-foreground">
+                  {liveEstimate.timeline}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>,
+      document.body
+      )}
+    </>
   );
 }

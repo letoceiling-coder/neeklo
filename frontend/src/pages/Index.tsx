@@ -4,7 +4,8 @@ import { SkruticSelector } from "@/components/sections/SkruticSelector";
 import { VideoCasesSlider } from "@/components/sections/VideoCasesSlider";
 import { ReadySolutions } from "@/components/sections/ReadySolutions";
 import { NewsSection } from "@/components/sections/NewsSection";
-import { ContactFormSection } from "@/components/sections/ContactFormSection";
+import { ContactFormModern } from "@/components/common/ContactFormModern";
+import { Container } from "@/components/common/Container";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/common/StructuredData";
 import { useMetaTags } from "@/hooks/useMetaTags";
@@ -78,9 +79,11 @@ const Index = () => {
         {/* News & Articles - SEO и доверие */}
         <NewsSection />
         
-        {/* Contact Form Section - светлая тема */}
-        <section id="contact">
-          <ContactFormSection />
+        {/* Contact Form Section — форма в стиле Neeklo + кнопки Telegram */}
+        <section id="contact" className="py-16 md:py-24">
+          <Container>
+            <ContactFormModern />
+          </Container>
         </section>
       </main>
       

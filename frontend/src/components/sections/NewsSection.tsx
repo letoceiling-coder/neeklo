@@ -17,31 +17,31 @@ interface NewsArticle {
   image?: string;
 }
 
-// Static articles data - ready for CMS/blog integration
+// Статьи для блока «Полезно для бизнеса» (ведут в /blog/:slug)
 const ARTICLES: NewsArticle[] = [
   {
-    id: "1",
-    title: "Как выбрать между лендингом и многостраничником",
-    excerpt: "Разбираем, когда бизнесу нужен лендинг, а когда — полноценный сайт",
-    date: "2025-01-15",
-    category: "Сайты",
-    slug: "landing-vs-multipage",
+    id: "ai-agents-for-business",
+    title: "AI-агенты для бизнеса: как автоматизировать рутину и увеличить продажи",
+    excerpt: "Разбираем, что такое AI-агенты, где они дают быстрый ROI и как внедрить первого агента за 2–4 недели. Кейсы и метрики.",
+    date: "2024-11-18",
+    category: "AI",
+    slug: "ai-agents-for-business",
   },
   {
-    id: "2",
-    title: "Telegram-бот для бизнеса: 5 сценариев автоматизации",
-    excerpt: "Реальные кейсы, которые экономят время и увеличивают продажи",
-    date: "2025-01-10",
+    id: "telegram-mini-app-roi",
+    title: "Telegram Mini App: когда окупается и как измерить ROI",
+    excerpt: "Разбираем, в каких задачах Mini App выигрывает у лендингов и мобильных приложений, как считать окупаемость и какие интеграции важны.",
+    date: "2024-11-12",
+    category: "Mini App",
+    slug: "telegram-mini-app-roi",
+  },
+  {
+    id: "chat-bots-leads-sales",
+    title: "Чат-боты для заявок и продаж: 5 сценариев, которые реально конвертируют",
+    excerpt: "Квалификация лидов, запись на услугу, продажа простых товаров, сбор пожеланий и реанимация — как настроить бота под воронку.",
+    date: "2024-11-05",
     category: "Боты",
-    slug: "telegram-bot-scenarios",
-  },
-  {
-    id: "3",
-    title: "AI-видео: тренд или необходимость?",
-    excerpt: "Почему бизнесы переходят на AI-видео и как это влияет на конверсию",
-    date: "2025-01-05",
-    category: "Видео",
-    slug: "ai-video-trends",
+    slug: "chat-bots-leads-sales",
   },
 ];
 
@@ -58,6 +58,9 @@ const categoryColors: Record<string, string> = {
   "Боты": "bg-green-500/15 text-green-400 border-green-500/25",
   "Видео": "bg-pink-500/15 text-pink-400 border-pink-500/25",
   "Mini App": "bg-orange-500/15 text-orange-400 border-orange-500/25",
+  "AI": "bg-violet-500/15 text-violet-400 border-violet-500/25",
+  "Автоматизация": "bg-amber-500/15 text-amber-400 border-amber-500/25",
+  "Маркетинг": "bg-rose-500/15 text-rose-400 border-rose-500/25",
 };
 
 export function NewsSection() {

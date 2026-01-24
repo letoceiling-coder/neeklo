@@ -1,6 +1,5 @@
-"use client";
-
 import { useState, useCallback, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Send, Loader2, Sparkles, X, FileText, Link2, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -89,16 +88,22 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
   // Закрытие по ESC
   useEffect(() => {
     if (!isOpen) return;
-    
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
+      if (e.key === 'Escape') onClose();
     };
-
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
+
+  // Блокировка скролла страницы при открытой модалке
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   const step = WIZARD_STEPS[currentStep];
   const progress = ((currentStep + 1) / WIZARD_STEPS.length) * 100;
@@ -172,57 +177,59 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
     }
   };
 
-  return (
+  const modal = (
     <AnimatePresence>
       {isOpen && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+          transition={{ duration: 0.25 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 md:p-8"
           onClick={onClose}
           role="dialog"
           aria-modal="true"
           aria-labelledby="brief-wizard-title"
         >
-          {/* Backdrop */}
-          <motion.div 
+          {/* Fullscreen overlay — полупрозрачный фон + размытие */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md" 
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 bg-black/90 backdrop-blur-xl"
           />
-          
-          {/* Modal - всегда по центру */}
+
+          {/* Контейнер модалки: max 800px, по центру, fade + slide up */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-md max-h-[95vh] sm:max-h-[90vh]
-                       flex flex-col bg-background border-2 border-border/50 
-                       rounded-2xl sm:rounded-2xl shadow-2xl shadow-black/50 overflow-hidden
-                       my-auto mx-4 sm:mx-0"
+            className="relative w-full max-w-[800px] max-h-[95vh] sm:max-h-[90vh]
+                       flex flex-col bg-background border border-white/10
+                       rounded-[24px] shadow-2xl shadow-black/50 overflow-hidden
+                       p-6 md:p-8"
             style={{ height: 'auto', minHeight: 'min(500px, 80vh)' }}
           >
-            {/* Header with close button */}
-            <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 
-                          border-b border-border/50 bg-background/50 backdrop-blur-sm">
+            {/* Крестик в правом верхнем углу */}
+            <button
+              onClick={onClose}
+              className="absolute top-6 right-6 z-10 p-2 rounded-xl text-muted-foreground
+                         hover:bg-muted hover:text-foreground transition-colors
+                         min-w-[44px] min-h-[44px] flex items-center justify-center
+                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              aria-label="Закрыть"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* Header — pr под крестик */}
+            <div className="pr-12 pb-3 md:pb-4 border-b border-border/50">
               <h2 id="brief-wizard-title" className="text-lg sm:text-xl font-bold text-foreground">
                 Заполните бриф
               </h2>
-              <button
-                onClick={onClose}
-                className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground 
-                         transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                aria-label="Закрыть форму"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
             {/* Progress bar */}
@@ -236,7 +243,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
             </div>
 
             {/* Step indicator */}
-            <div className="flex justify-center gap-2 px-6 pt-4 pb-2">
+            <div className="flex justify-center gap-2 pt-4 pb-2">
               {WIZARD_STEPS.map((_, idx) => (
                 <motion.div
                   key={idx}
@@ -254,7 +261,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 pb-4 sm:pb-6 pt-4
+            <div className="flex-1 overflow-y-auto overflow-x-hidden pb-4 sm:pb-6 pt-4
                           scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border/50
                           hover:scrollbar-thumb-border">
               <AnimatePresence mode="wait">
@@ -416,7 +423,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
 
             {/* Attachments preview */}
             {attachments.length > 0 && (
-              <div className="px-4 sm:px-6 pb-2 border-t border-border/30 pt-4">
+              <div className="pb-2 border-t border-border/30 pt-4">
                 <div className="flex flex-wrap gap-2 justify-center">
                   {attachments.map((attachment, index) => (
                     <div
@@ -443,7 +450,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
             )}
 
             {/* Fun footer */}
-            <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-border/30 pt-3">
+            <div className="pb-4 sm:pb-6 border-t border-border/30 pt-3">
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <Sparkles className="w-3 h-3 flex-shrink-0" />
                 <span>Шаг {currentStep + 1} из {WIZARD_STEPS.length}</span>
@@ -454,4 +461,7 @@ export function BriefWizard({ isOpen, onClose, initialInput = "", attachments = 
       )}
     </AnimatePresence>
   );
+
+  if (typeof document === "undefined") return null;
+  return createPortal(modal, document.body);
 }

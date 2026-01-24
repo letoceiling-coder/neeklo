@@ -10,7 +10,7 @@ import { useMetaTags } from "@/hooks/useMetaTags";
 import productPages from "@/data/productPages.json";
 import { cn, scrollToElement } from "@/lib/utils";
 
-import { ChevronLeft, ChevronRight, Home, MessageCircle, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, MessageCircle, Send } from "lucide-react";
 
 interface ProductData {
   slug: string;
@@ -69,18 +69,31 @@ export const ProductPageTemplate = ({ data }: ProductPageTemplateProps) => {
 
   return (
     <div className="min-h-screen bg-background pt-20">
-      {/* Breadcrumbs */}
+      {/* Breadcrumbs — в один ряд, ровно при любом адаптиве: [Home /] [Каталог /] [Название] */}
       <Container className="py-3 md:py-4">
-        <nav className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground">
-          <Link to="/" className="hover:text-foreground transition-colors flex items-center gap-1">
-            <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
-          </Link>
-          <span className="text-muted-foreground/50">/</span>
-          <Link to="/products" className="hover:text-foreground transition-colors">
-            Каталог
-          </Link>
-          <span className="text-muted-foreground/50">/</span>
-          <span className="text-foreground font-medium truncate">{data.title}</span>
+        <nav
+          className="flex items-center flex-nowrap overflow-hidden min-w-0 gap-1 sm:gap-1.5 text-xs sm:text-sm text-muted-foreground leading-tight"
+          aria-label="Хлебные крошки"
+        >
+          <span className="inline-flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <Link
+              to="/"
+              className="no-min-touch hover:text-foreground transition-colors inline-flex items-center"
+              aria-label="На главную"
+            >
+              <Home className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 shrink-0" />
+            </Link>
+            <span className="text-muted-foreground/50 select-none">/</span>
+          </span>
+          <span className="inline-flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <Link to="/products" className="no-min-touch hover:text-foreground transition-colors whitespace-nowrap">
+              Каталог
+            </Link>
+            <span className="text-muted-foreground/50 select-none">/</span>
+          </span>
+          <span className="min-w-0 overflow-hidden">
+            <span className="block truncate text-foreground font-medium">{data.title}</span>
+          </span>
         </nav>
       </Container>
 
@@ -133,10 +146,10 @@ export const ProductPageTemplate = ({ data }: ProductPageTemplateProps) => {
                 </div>
               )}
 
-              {/* Single CTA */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              {/* CTA: слева — Обсудить, справа — всегда В Telegram (та же ссылка, что везде) */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 flex-wrap">
                 <a
-                  href={data.telegramLink}
+                  href={`${data.telegramLink}?text=${encodeURIComponent(`Здравствуйте! Интересует ${data.title}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className={cn(
@@ -151,20 +164,26 @@ export const ProductPageTemplate = ({ data }: ProductPageTemplateProps) => {
                   <MessageCircle className="w-5 h-5" />
                   Обсудить проект
                 </a>
-                <button
-                  onClick={() => {
-                    scrollToElement('packages', 100, 'smooth');
-                  }}
+                <a
+                  href={data.telegramLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={cn(
                     "inline-flex items-center gap-2",
                     "px-5 py-3 rounded-xl",
-                    "text-muted-foreground hover:text-foreground",
+                    "text-muted-foreground hover:text-foreground border border-border",
                     "font-medium text-sm",
                     "transition-colors duration-200"
                   )}
                 >
+                  <Send className="w-4 h-4" />
+                  В Telegram
+                </a>
+                <button
+                  onClick={() => scrollToElement('packages', 100, 'smooth')}
+                  className="text-sm text-muted-foreground/80 hover:text-foreground underline underline-offset-2 transition-colors"
+                >
                   Смотреть пакеты
-                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </motion.div>

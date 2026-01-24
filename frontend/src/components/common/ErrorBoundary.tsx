@@ -1,5 +1,3 @@
-"use client";
-
 import { Component, ErrorInfo, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { AlertTriangle, Home, RefreshCw, ShoppingBag } from "lucide-react";
@@ -97,7 +95,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Link>
 
               <Link
-                to="/products"
+                to="/services"
                 className={cn(
                   "inline-flex items-center justify-center gap-2",
                   "px-5 py-2.5 rounded-xl",
@@ -107,7 +105,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 )}
               >
                 <ShoppingBag className="w-4 h-4" />
-                Каталог
+                Услуги
               </Link>
             </div>
           </div>

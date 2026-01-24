@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { MessageCircle, ArrowDown, Home } from "lucide-react";
+import { MessageCircle, Home, Send } from "lucide-react";
 import { cn, scrollToElement } from "@/lib/utils";
 import { Container } from "@/components/common/Container";
 
@@ -39,25 +39,33 @@ export function ProductHeroCompact({
   return (
     <section className="pt-20 pb-8 md:pt-24 lg:pt-28 md:pb-12">
       <Container className="py-3 md:py-4">
-        {/* Breadcrumb */}
+        {/* Breadcrumb — в один ряд, ровно при любом адаптиве: [Home /] [Каталог /] [Название] */}
         <motion.nav
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm text-muted-foreground"
+          className="flex items-center flex-nowrap overflow-hidden min-w-0 gap-1 sm:gap-1.5 text-xs sm:text-sm text-muted-foreground leading-tight"
+          aria-label="Хлебные крошки"
         >
-          <Link
-            to="/"
-            className="hover:text-foreground transition-colors flex items-center gap-1"
-          >
-            <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
-          </Link>
-          <span className="text-muted-foreground/50">/</span>
-          <Link to="/products" className="hover:text-foreground transition-colors">
-            Каталог
-          </Link>
-          <span className="text-muted-foreground/50">/</span>
-          <span className="text-foreground font-medium truncate">{title}</span>
+          <span className="inline-flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <Link
+              to="/"
+              className="no-min-touch hover:text-foreground transition-colors inline-flex items-center"
+              aria-label="На главную"
+            >
+              <Home className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 shrink-0" />
+            </Link>
+            <span className="text-muted-foreground/50 select-none">/</span>
+          </span>
+          <span className="inline-flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+            <Link to="/products" className="no-min-touch hover:text-foreground transition-colors whitespace-nowrap">
+              Каталог
+            </Link>
+            <span className="text-muted-foreground/50 select-none">/</span>
+          </span>
+          <span className="min-w-0 overflow-hidden">
+            <span className="block truncate text-foreground font-medium">{title}</span>
+          </span>
         </motion.nav>
       </Container>
       
@@ -131,7 +139,7 @@ export function ProductHeroCompact({
               key={index}
               className={cn(
                 "px-3 py-1.5",
-                "text-xs md:text-sm",
+                "text-sm",
                 "rounded-lg",
                 "bg-muted/50 text-foreground",
                 "border border-border/50"
@@ -142,7 +150,7 @@ export function ProductHeroCompact({
           ))}
         </motion.div>
 
-        {/* CTAs */}
+        {/* CTAs: слева — Обсудить, справа — всегда в Telegram (та же ссылка, что везде) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -165,17 +173,30 @@ export function ProductHeroCompact({
             Обсудить проект
           </button>
 
+          <a
+            href={`${telegramLink}?text=${encodeURIComponent(`Здравствуйте! Интересует ${title}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(
+              "inline-flex items-center gap-1.5",
+              "px-4 py-2.5 rounded-xl",
+              "text-sm font-medium text-muted-foreground",
+              "hover:text-foreground hover:bg-muted/50",
+              "transition-colors border border-border/50"
+            )}
+          >
+            <Send className="w-4 h-4" />
+            В Telegram
+          </a>
+
           <button
             onClick={handleScrollToExamples}
             className={cn(
-              "inline-flex items-center gap-1.5",
-              "px-4 py-2.5",
-              "text-sm font-medium text-muted-foreground",
-              "hover:text-foreground transition-colors"
+              "text-sm text-muted-foreground/80 hover:text-foreground",
+              "underline underline-offset-2 transition-colors"
             )}
           >
             Примеры
-            <ArrowDown className="w-4 h-4" />
           </button>
         </motion.div>
       </div>

@@ -12,16 +12,16 @@ export function PageTransition({ children }: PageTransitionProps) {
   const shouldReduceMotion = usePrefersReducedMotion();
   const [isFirstMount, setIsFirstMount] = useState(true);
 
-  // Skip animation on first mount to prevent initial flash
+  // Пропуск анимации при первом рендере
   useEffect(() => {
-    const timer = setTimeout(() => setIsFirstMount(false), 100);
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setIsFirstMount(false), 50);
+    return () => clearTimeout(t);
   }, []);
 
   const pageVariants = {
     initial: {
       opacity: isFirstMount ? 1 : 0,
-      y: shouldReduceMotion || isFirstMount ? 0 : 12,
+      y: shouldReduceMotion || isFirstMount ? 0 : 10,
     },
     animate: {
       opacity: 1,
@@ -29,12 +29,12 @@ export function PageTransition({ children }: PageTransitionProps) {
     },
     exit: {
       opacity: 0,
-      y: shouldReduceMotion ? 0 : -8,
+      y: shouldReduceMotion ? 0 : -6,
     },
   };
 
   const pageTransition = {
-    duration: shouldReduceMotion || isFirstMount ? 0 : 0.25,
+    duration: shouldReduceMotion || isFirstMount ? 0 : 0.18,
     ease: [0.25, 0.46, 0.45, 0.94] as const,
   };
 

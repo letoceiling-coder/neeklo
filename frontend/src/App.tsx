@@ -18,20 +18,23 @@ import { useWebVitals } from "@/hooks/useWebVitals";
 import { useScrollAnimations } from "@/hooks/useScrollAnimations";
 import Index from "./pages/Index";
 
-// Lazy load pages for code splitting
-const Work = lazy(() => import("./pages/Work"));
+// Ключевые страницы (Услуги, Кейсы, О нас, Контакты, Процесс) — без lazy, открываются с первого раза
+import Work from "./pages/Work";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Services from "./pages/Services";
+import Process from "./pages/Process";
+
+// Остальные — lazy для экономии первого запроса
 const WorkDetail = lazy(() => import("./pages/WorkDetail"));
-const About = lazy(() => import("./pages/About"));
-const Contact = lazy(() => import("./pages/Contact"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Offer = lazy(() => import("./pages/Offer"));
 const Consent = lazy(() => import("./pages/Consent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Services = lazy(() => import("./pages/Services"));
 const Cases = lazy(() => import("./pages/Cases"));
-const Process = lazy(() => import("./pages/Process"));
 const Admin = lazy(() => import("./pages/Admin"));
+const BlogArticle = lazy(() => import("./pages/blog/BlogArticle"));
 
 // Product pages (all products)
 const Website = lazy(() => import("./pages/products/Website"));
@@ -91,6 +94,7 @@ function AppRoutes() {
       <Route path="/offer" element={<Offer />} />
       <Route path="/consent" element={<Consent />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/blog/:slug" element={<BlogArticle />} />
       
       {/* Product pages - all products */}
       <Route path="/products/website" element={<Website />} />

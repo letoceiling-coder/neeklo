@@ -1,5 +1,3 @@
-"use client";
-
 import { memo } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,7 +41,7 @@ export const BottomNav = memo(function BottomNav({ onMenuOpen }: BottomNavProps)
 
   const handleTabClick = (tab: NavTab) => {
     if (tab.action === "telegram") {
-      window.open("https://t.me/neeklo_bot", "_blank");
+      window.open("https://t.me/neeklo", "_blank");
     } else if (tab.action === "menu" && onMenuOpen) {
       onMenuOpen();
     }

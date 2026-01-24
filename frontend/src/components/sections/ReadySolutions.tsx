@@ -53,7 +53,7 @@ const SOLUTIONS: Solution[] = [
   },
 ];
 
-// Solution Card Component - entire card is clickable
+// Solution Card — compact catalog style, equal height
 const SolutionCard = memo(function SolutionCard({
   solution,
   index,
@@ -66,7 +66,7 @@ const SolutionCard = memo(function SolutionCard({
   shouldReduceMotion: boolean;
 }) {
   const Icon = solution.icon;
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -81,70 +81,57 @@ const SolutionCard = memo(function SolutionCard({
       <Link
         to={solution.href}
         className={cn(
-          "group flex flex-col h-full cursor-pointer",
-          "rounded-xl",
-          "p-6 md:p-8",
-          "bg-background",
-          "border border-border/50",
-          "shadow-md",
-          "card-hover",
-          "min-h-[240px] md:min-h-[260px]",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+          "group flex flex-col h-full cursor-pointer overflow-hidden",
+          "rounded-xl p-5 md:p-6",
+          "bg-zinc-900 border border-zinc-700/50",
+          "shadow-md card-hover",
+          "min-h-[220px]",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/50"
         )}
       >
-        {/* Icon + Title */}
-        <div className="flex items-start gap-4 mb-6">
-          <div className={cn(
-            "flex-shrink-0",
-            "w-12 h-12 md:w-14 md:h-14",
-            "rounded-xl",
-            "bg-primary/10",
-            "border border-primary/20",
-            "flex items-center justify-center",
-            "group-hover:bg-primary/15",
-            "transition-colors duration-200"
-          )}>
-            <Icon className="w-6 h-6 md:w-7 md:h-7 text-primary" strokeWidth={1.5} />
+        {/* Icon + Title (1 line) */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div
+            className={cn(
+              "w-10 h-10 rounded-lg flex-shrink-0",
+              "bg-cyan-400/10 border border-cyan-400/20",
+              "flex items-center justify-center",
+              "group-hover:bg-cyan-400/15 transition-colors duration-200"
+            )}
+          >
+            <Icon className="w-5 h-5 text-cyan-400" strokeWidth={1.5} />
           </div>
-          <h3 className={cn(
-            "text-xl md:text-2xl font-semibold text-foreground pt-1",
-            "group-hover:text-primary transition-colors duration-200"
-          )}>
+          <h3 className="text-base font-semibold text-foreground truncate">
             {solution.title}
           </h3>
         </div>
 
-        {/* Price + Duration block with icons */}
-        <div className="flex-1 flex flex-col justify-end space-y-4 mb-6">
-          {/* Price with icon */}
-          <div className="flex items-center gap-2.5">
-            <Currency className="w-5 h-5 text-primary flex-shrink-0" />
-            <span className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">
+        {/* Price + Срок — flex-1 для выравнивания, больше отступ между строками */}
+        <div className="flex flex-col gap-2.5 flex-1 py-4">
+          <div className="flex items-center gap-2">
+            <Currency className="w-4 h-4 text-cyan-400 flex-shrink-0" />
+            <span className="text-lg font-bold text-foreground tracking-tight">
               {solution.price}
             </span>
           </div>
-          
-          {/* Duration with icon */}
-          <div className="flex items-center gap-2.5">
-            <Clock className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-            <span className="text-base md:text-lg text-muted-foreground">
-              {solution.duration}
+          <div className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm text-muted-foreground">
+              Срок: {solution.duration}
             </span>
           </div>
         </div>
 
-        {/* CTA Button */}
-        <div className={cn(
-          "inline-flex items-center justify-center gap-2",
-          "w-full py-3 px-5",
-          "rounded-lg",
-          "text-sm font-medium",
-          "bg-primary text-primary-foreground",
-          "hover:bg-primary/90",
-          "shadow-sm hover:shadow-md",
-          "transition-all duration-200",
-          "min-h-[40px]"
-        )}>
+        {/* CTA */}
+        <div
+          className={cn(
+            "inline-flex items-center justify-center gap-2 w-full py-3 px-4 rounded-lg flex-shrink-0",
+            "text-sm font-medium",
+            "bg-cyan-400/15 border border-cyan-400/40 text-cyan-400",
+            "hover:bg-cyan-400/25 transition-all duration-200",
+            "min-h-[44px]"
+          )}
+        >
           <MessageCircle className="w-4 h-4" />
           Обсудить
         </div>
@@ -166,7 +153,7 @@ export function ReadySolutions() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10"
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10 md:mb-12"
         >
           <div>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
@@ -177,23 +164,22 @@ export function ReadySolutions() {
             </p>
           </div>
 
-          {/* Desktop: All products link */}
+          {/* Desktop: All services link */}
           <Link
-            to="/products"
+            to="/services"
             className={cn(
               "hidden md:inline-flex items-center gap-1.5",
-              "text-sm font-medium",
-              "text-muted-foreground hover:text-foreground",
-              "transition-colors duration-200"
+              "text-sm font-medium text-cyan-400",
+              "hover:text-cyan-300 transition-colors duration-200"
             )}
           >
-            Все продукты
+            Все услуги
             <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
 
-        {/* Solutions Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        {/* Solutions Grid: 2x2 mobile, 4 cols desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
           {SOLUTIONS.map((solution, index) => (
             <SolutionCard
               key={solution.id}
@@ -211,22 +197,20 @@ export function ReadySolutions() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.4, delay: 0.3 }}
-          className="mt-8 md:hidden"
+          className="mt-10 md:hidden"
         >
           <Link
-            to="/products"
+            to="/services"
             className={cn(
               "flex items-center justify-center gap-2 w-full",
-              "py-3 px-5 rounded-lg",
-              "bg-foreground/[0.03] dark:bg-white/[0.035]",
-              "border border-foreground/[0.08] dark:border-white/[0.08]",
-              "text-sm font-medium text-foreground",
-              "hover:bg-foreground/[0.06] dark:hover:bg-white/[0.06]",
-              "transition-all duration-200",
-              "min-h-[40px]"
+              "py-3 px-5 rounded-lg min-h-[40px]",
+              "bg-zinc-800/80 border border-zinc-600/50",
+              "text-sm font-medium text-cyan-400",
+              "hover:bg-zinc-700/80 hover:border-cyan-400/30",
+              "transition-all duration-200"
             )}
           >
-            Все продукты
+            Все услуги
             <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>

@@ -1,9 +1,7 @@
-"use client";
-
 import { useRef, useState, useEffect, useCallback, memo } from "react";
 import { motion, useMotionValue, useSpring, PanInfo } from "framer-motion";
 import { Container } from "@/components/common/Container";
-import { ArrowRight, ArrowLeft, Play, ExternalLink } from "lucide-react";
+import { ArrowRight, ArrowLeft, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link, useNavigate } from "react-router-dom";
 import { useMobile } from "@/hooks/useMobile";
@@ -45,7 +43,7 @@ const categoryConfig: Record<string, {
     productSlug: "ai-agent"
   },
   "AI-Video": { 
-    label: "Видео", 
+    label: "AI Видео", 
     color: "bg-pink-500/20 text-pink-300 border-pink-500/30",
     productSlug: "ai-video"
   },
@@ -71,10 +69,10 @@ const categoryConfig: Record<string, {
   },
 };
 
-// Card dimensions - 9:16 aspect ratio for mobile-first reels feel
-const CARD_WIDTH_MOBILE = 200;
-const CARD_WIDTH_TABLET = 240;
-const CARD_WIDTH_DESKTOP = 280;
+// Card dimensions: 2.5 / 2 / 1 visible on desktop / tablet / mobile
+const CARD_WIDTH_MOBILE = 240;
+const CARD_WIDTH_TABLET = 280;
+const CARD_WIDTH_DESKTOP = 300;
 const CARD_GAP = 16;
 
 // Case card component
@@ -142,11 +140,14 @@ const CaseCard = memo(function CaseCard({
         onClick={onCardClick}
         className={cn(
           "group block relative",
-          "w-[200px] md:w-[240px] lg:w-[280px]",
+          "w-[240px] md:w-[280px] lg:w-[300px]",
           "aspect-[9/16]",
-          "rounded-[20px] lg:rounded-[28px]",
+          "rounded-2xl",
           "overflow-hidden",
-          "bg-muted/30"
+          "bg-neutral-900",
+          "hover:ring-2 hover:ring-cyan-500/40",
+          "transition-all duration-300 ease-out",
+          !shouldReduceMotion && "hover:-translate-y-2 hover:scale-[1.02] hover:shadow-xl"
         )}
       >
         {/* Video/Image Background */}
@@ -227,7 +228,7 @@ const CaseCard = memo(function CaseCard({
         )}
 
         {/* Content - Bottom */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-10">
+        <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4 z-10">
           {/* Category Badge */}
           <span
             className={cn(
@@ -242,28 +243,31 @@ const CaseCard = memo(function CaseCard({
           </span>
 
           {/* Title */}
-          <h3 className="text-sm md:text-base font-semibold text-white mb-1 line-clamp-2">
+          <h3 className="text-sm md:text-base font-bold text-white/90 mb-1 line-clamp-2">
             {caseItem.title}
           </h3>
 
           {/* Result */}
-          <p className="text-xs md:text-sm text-white/70 font-medium line-clamp-1">
+          <p className="text-xs md:text-sm text-white/80 font-medium line-clamp-1 mb-2">
             {caseItem.result}
           </p>
 
-          {/* Product Link (if available) - use button to avoid nested <a> */}
+          {/* CTA: Смотреть кейс — карточка целиком Link, визуально выделяем */}
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-cyan-400 group-hover:text-cyan-300 transition-colors">
+            Смотреть кейс →
+          </span>
+
+          {/* Заказать такой (if product) — button to avoid nested <a> */}
           {caseItem.tag.productSlug && (
             <button
               onClick={(e) => onProductClick(caseItem.tag.productSlug!, e)}
               className={cn(
-                "mt-3 inline-flex items-center gap-1.5",
-                "text-xs font-medium text-primary",
-                "hover:underline",
-                "bg-transparent border-none cursor-pointer p-0"
+                "mt-2 block text-xs font-medium text-cyan-400 hover:text-cyan-300",
+                "transition-colors hover:underline",
+                "bg-transparent border-none cursor-pointer p-0 text-left"
               )}
             >
-              <ExternalLink className="w-3 h-3" />
-              Заказать такой
+              Заказать такой →
             </button>
           )}
         </div>
@@ -404,7 +408,7 @@ export function VideoCasesSlider() {
     navigate(`/products/${productSlug}`);
   }, [navigate]);
 
-  // Navigation arrows
+  // Navigation arrows: mobile 1 col, tablet/desktop use wider cards
   const cardWidth = isMobile ? CARD_WIDTH_MOBILE : CARD_WIDTH_DESKTOP;
   const scrollAmount = cardWidth + CARD_GAP;
 
@@ -511,8 +515,7 @@ export function VideoCasesSlider() {
           className={cn(
             "flex gap-4",
             "cursor-grab active:cursor-grabbing",
-            // Peek padding - show part of next card
-            "pl-4 md:pl-6 lg:pl-[calc((100vw-1440px)/2+32px)]",
+            "pl-4 md:pl-6 lg:pl-[max(1.5rem,calc((100vw-1440px)/2+2rem))]",
             "pr-[20%] md:pr-[15%] lg:pr-[10%]",
             "select-none"
           )}

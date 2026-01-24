@@ -281,6 +281,12 @@ textarea:focus-visible {
     background-color: hsl(0 0% 4%);
     /* Global scroll padding for fixed header - accounts for navigation height */
     scroll-padding-top: 100px;
+    /* Переносы: не оставлять предлог в конце строки. Для этого в контенте между
+       предлогом и словом используйте неразрывный пробел (U+00A0): в\u00A0, на\u00A0,
+       с\u00A0, к\u00A0, из\u00A0, о\u00A0, у\u00A0, за\u00A0, под\u00A0, для\u00A0, от\u00A0,
+       до\u00A0, по\u00A0, при\u00A0, без\u00A0 и т.п. */
+    hyphens: auto;
+    -webkit-hyphens: auto;
   }
   
   html.light-mode {

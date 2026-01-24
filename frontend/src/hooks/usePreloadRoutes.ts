@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { scheduleIdleWork } from '@/lib/performance';
 
-// All product page imports for preloading
+// Product page imports for preloading (main nav: Services, Work, About, Contact, Process — в main bundle)
 const productImports = {
   'ai-agent': () => import('@/pages/products/AIAgent'),
   'telegram-bot': () => import('@/pages/products/TelegramBot'),
@@ -18,22 +18,16 @@ const productImports = {
   'consulting': () => import('@/pages/products/Consulting'),
 };
 
-// Route preload configuration with smart prioritization
+// Route preload: Services/Work/About/Contact/Process — в main bundle, остальное подгружаем
 const routePreloads: Record<string, Array<() => Promise<unknown>>> = {
   '/': [
-    () => import('@/pages/Services'),
-    () => import('@/pages/Contact'),
     productImports['ai-agent'],
     productImports['website'],
     productImports['telegram-bot'],
   ],
-  '/services': [
-    () => import('@/pages/Services'),
-    ...Object.values(productImports),
-  ],
-  '/cases': [
-    () => import('@/pages/WorkDetail'),
-  ],
+  '/services': [...Object.values(productImports)],
+  '/work': [() => import('@/pages/WorkDetail')],
+  '/cases': [() => import('@/pages/WorkDetail')],
 };
 
 export function usePreloadRoutes() {
@@ -55,34 +49,32 @@ export function usePreloadRoutes() {
     if (preloadedRef.current.has(currentPath)) return;
     preloadedRef.current.add(currentPath);
 
-    // Use idle callback to avoid blocking main thread
+    // Preload как можно раньше (idle или через 150ms)
     scheduleIdleWork(() => {
       const preloads = routePreloads[currentPath];
       if (preloads) {
         preloads.forEach(load => {
-          load().catch(() => {
-            // Silently fail - preloading is optional
-          });
+          load().catch(() => {});
         });
       }
-    }, 500); // Reduced timeout for faster preloading
+    }, 150);
   }, [location.pathname]);
 
-  // Add hover listeners for product links
+  // Preload при наведении/тапе на ссылки продуктов
   useEffect(() => {
-    const handleLinkHover = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a[href^="/products/"]');
-      if (link) {
-        const href = link.getAttribute('href');
-        if (href) {
-          const slug = href.replace('/products/', '');
-          preloadProduct(slug);
-        }
-      }
+    const handleLinkHover = (e: MouseEvent | TouchEvent) => {
+      const target = (e.target as HTMLElement)?.closest?.('a[href^="/products/"]');
+      if (!target) return;
+      const href = target.getAttribute('href') || '';
+      const slug = href.replace('/products/', '');
+      if (slug) preloadProduct(slug);
     };
 
     document.addEventListener('mouseover', handleLinkHover, { passive: true });
-    return () => document.removeEventListener('mouseover', handleLinkHover);
+    document.addEventListener('touchstart', handleLinkHover, { passive: true });
+    return () => {
+      document.removeEventListener('mouseover', handleLinkHover);
+      document.removeEventListener('touchstart', handleLinkHover);
+    };
   }, [preloadProduct]);
 }
