@@ -14,10 +14,11 @@ import {
   Video, 
   Smartphone, 
   Cog, 
-  Send
+  Send,
+  Play
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { QuickOrderForm } from "@/components/common/QuickOrderForm";
 import { useMobile } from "@/hooks/useMobile";
 
@@ -55,7 +56,30 @@ const About = () => {
   );
 
   const [isOrderFormOpen, setIsOrderFormOpen] = useState(false);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   const isMobile = useMobile();
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Запуск видео на десктопе (autoplay не всегда срабатывает)
+  useEffect(() => {
+    if (isMobile) return;
+    const v = videoRef.current;
+    if (!v) return;
+    const onCanPlay = () => { v.play().catch(() => {}); setVideoPlaying(true); };
+    v.addEventListener("canplay", onCanPlay);
+    const t = setTimeout(() => { v.play().catch(() => {}); }, 400);
+    return () => {
+      v.removeEventListener("canplay", onCanPlay);
+      clearTimeout(t);
+    };
+  }, [isMobile]);
+
+  const handleVideoPlay = () => {
+    const v = videoRef.current;
+    if (v) {
+      v.play().then(() => setVideoPlaying(true)).catch(() => {});
+    }
+  };
 
   // Value cards data
   const valueCards = [
@@ -108,17 +132,33 @@ const About = () => {
           {/* Video Background */}
           <div className="absolute inset-0 z-0">
             <video
+              ref={videoRef}
               autoPlay={!isMobile}
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
+              onPlay={() => setVideoPlaying(true)}
+              onPause={() => setVideoPlaying(false)}
               className="w-full h-full object-cover"
             >
               <source src="/videos/neeklo_hello.mp4" type="video/mp4" />
             </video>
             {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80 pointer-events-none" />
+            {/* Кнопка play на мобильных, когда видео не идёт */}
+            {isMobile && !videoPlaying && (
+              <button
+                type="button"
+                onClick={handleVideoPlay}
+                className="absolute inset-0 z-[2] flex items-center justify-center"
+                aria-label="Запустить видео"
+              >
+                <span className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                  <Play className="w-7 h-7 text-foreground ml-1" fill="currentColor" />
+                </span>
+              </button>
+            )}
           </div>
           
           {/* Hero Content */}

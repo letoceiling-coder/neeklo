@@ -24,7 +24,10 @@ const routePreloads: Record<string, Array<() => Promise<unknown>>> = {
     productImports['ai-agent'],
     productImports['website'],
     productImports['telegram-bot'],
+    () => import('@/pages/blog/BlogArticle'),
+    () => import('@/pages/Blog'),
   ],
+  '/blog': [() => import('@/pages/blog/BlogArticle')],
   '/services': [...Object.values(productImports)],
   '/work': [() => import('@/pages/WorkDetail')],
   '/cases': [() => import('@/pages/WorkDetail')],
@@ -60,14 +63,19 @@ export function usePreloadRoutes() {
     }, 150);
   }, [location.pathname]);
 
-  // Preload при наведении/тапе на ссылки продуктов
+  // Preload при наведении/тапе на ссылки продуктов и статей блога
   useEffect(() => {
     const handleLinkHover = (e: MouseEvent | TouchEvent) => {
-      const target = (e.target as HTMLElement)?.closest?.('a[href^="/products/"]');
+      const target = (e.target as HTMLElement)?.closest?.('a[href]');
       if (!target) return;
-      const href = target.getAttribute('href') || '';
-      const slug = href.replace('/products/', '');
-      if (slug) preloadProduct(slug);
+      const href = (target.getAttribute('href') || '').split('?')[0];
+      if (href.startsWith('/products/')) {
+        const slug = href.replace('/products/', '');
+        if (slug) preloadProduct(slug);
+      }
+      if (href.startsWith('/blog/')) {
+        import('@/pages/blog/BlogArticle').catch(() => {});
+      }
     };
 
     document.addEventListener('mouseover', handleLinkHover, { passive: true });

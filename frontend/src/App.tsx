@@ -34,6 +34,7 @@ const Consent = lazy(() => import("./pages/Consent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Cases = lazy(() => import("./pages/Cases"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/blog/BlogArticle"));
 
 // Product pages (all products)
@@ -94,6 +95,7 @@ function AppRoutes() {
       <Route path="/offer" element={<Offer />} />
       <Route path="/consent" element={<Consent />} />
       <Route path="/admin" element={<Admin />} />
+      <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogArticle />} />
       
       {/* Product pages - all products */}

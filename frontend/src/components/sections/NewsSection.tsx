@@ -75,7 +75,7 @@ export function NewsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: shouldReduceMotion ? 0 : 0.5 }}
-          className="flex items-center justify-between mb-8 md:mb-10"
+          className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 md:mb-10"
         >
           <div>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
@@ -85,6 +85,12 @@ export function NewsSection() {
               Разборы, кейсы и практические советы
             </p>
           </div>
+          <Link
+            to="/blog"
+            className="text-sm font-medium text-primary hover:underline shrink-0"
+          >
+            Все статьи →
+          </Link>
         </motion.div>
 
         {/* Articles Grid */}

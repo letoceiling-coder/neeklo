@@ -1,21 +1,28 @@
 import { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import { AnimatedBackground } from './AnimatedBackground';
 
 const Spline = lazy(() => import('@splinetool/react-spline'));
 
+const MOBILE_BREAKPOINT = 768;
+
 export function SplineBackground() {
   const [isMobile, setIsMobile] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Определить мобильное устройство
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
 
   useEffect(() => {
@@ -100,20 +107,39 @@ export function SplineBackground() {
     };
   }, [isMobile]);
 
-  // На мобильных показать статичный фон вместо 3D
+  // На мобильных: живой фон (canvas) или fallback-градиент при reduced-motion
   if (isMobile) {
     return (
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `
-              radial-gradient(circle at 30% 50%, rgba(139, 92, 246, 0.15), transparent 50%),
-              radial-gradient(circle at 70% 80%, rgba(34, 211, 238, 0.15), transparent 50%),
-              #0a0a0a
-            `
-          }}
-        />
+        {prefersReducedMotion ? (
+          // Fallback: статичный градиент, если пользователь запросил меньше анимации
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `
+                radial-gradient(ellipse 80% 60% at 30% 50%, rgba(139, 92, 246, 0.2), transparent 50%),
+                radial-gradient(ellipse 70% 50% at 70% 80%, rgba(34, 211, 238, 0.2), transparent 50%),
+                radial-gradient(ellipse 100% 100% at 50% 50%, rgba(34, 211, 238, 0.06), transparent 70%),
+                #0a0a0a
+              `
+            }}
+          />
+        ) : (
+          // Живой фон: анимированная сетка (canvas), как на десктопе — двигается, виден за контентом
+          <>
+            <AnimatedBackground />
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `
+                  linear-gradient(to right, rgba(0,0,0,0.75), transparent 28%, transparent 72%, rgba(0,0,0,0.75)),
+                  linear-gradient(to bottom, transparent 45%, rgba(0,0,0,0.85))
+                `
+              }}
+              aria-hidden="true"
+            />
+          </>
+        )}
       </div>
     );
   }

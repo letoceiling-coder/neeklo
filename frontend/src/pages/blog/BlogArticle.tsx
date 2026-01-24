@@ -68,7 +68,7 @@ const BlogArticle = () => {
         <Container className="py-3 md:py-4">
           <Breadcrumbs
             items={[
-              { label: "Блог", url: "/" },
+              { label: "Блог", url: "/blog" },
               { label: article.h1, url: `/blog/${article.slug}` },
             ]}
           />
