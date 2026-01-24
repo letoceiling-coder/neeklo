@@ -21,15 +21,14 @@ const productImports = {
 // Route preload configuration with smart prioritization
 const routePreloads: Record<string, Array<() => Promise<unknown>>> = {
   '/': [
-    () => import('@/pages/Products'),
+    () => import('@/pages/Services'),
     () => import('@/pages/Contact'),
-    // Preload popular product pages
     productImports['ai-agent'],
     productImports['website'],
     productImports['telegram-bot'],
   ],
-  '/products': [
-    // Preload all product pages when on products listing
+  '/services': [
+    () => import('@/pages/Services'),
     ...Object.values(productImports),
   ],
   '/cases': [

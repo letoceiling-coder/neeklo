@@ -60,8 +60,9 @@ export function HeroSection() {
         {/* Content */}
         <div 
           className="relative z-10 w-full h-screen flex items-start justify-center 
-                     px-6 sm:px-8 md:px-12 lg:px-16 text-center pointer-events-none
-                     transition-opacity duration-100 ease-out pt-24 sm:pt-28 md:pt-32"
+                     px-4 sm:px-6 md:px-10 lg:px-16 text-center pointer-events-none
+                     transition-opacity duration-100 ease-out 
+                     pt-16 sm:pt-20 md:pt-24 lg:pt-28"
           style={{
             opacity: scrollOpacity,
             transform: `translateY(${(1 - scrollOpacity) * -20}px)`,
@@ -69,110 +70,115 @@ export function HeroSection() {
           }}
         >
           
-          <div className="flex flex-col items-center justify-start max-w-6xl w-full text-center mt-0">
-            {/* Main headline */}
-            <motion.h1
-              initial={shouldReduceMotion ? {} : fadeInUp.initial}
-              animate={shouldReduceMotion ? {} : fadeInUp.animate}
-              transition={
-                shouldReduceMotion
-                  ? {}
-                  : { ...fadeInUp.transition, delay: 0.3 }
-              }
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 
-                         font-extrabold leading-[1.1] tracking-tight text-white
-                         drop-shadow-[0_4px_20px_rgba(0,0,0,1)] mb-6"
-            >
-              Создание сайтов,{' '}
-              <br className="hidden md:block" />
-              Mini App и AI видео
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-              transition={
-                shouldReduceMotion
-                  ? {}
-                  : { duration: 0.6, delay: 0.5 }
-              }
-              className="text-base sm:text-lg md:text-xl lg:text-2xl 
-                         text-white font-medium leading-relaxed
-                         drop-shadow-[0_4px_16px_rgba(0,0,0,1)]
-                         max-w-3xl mx-auto mb-10"
-            >
-              Разрабатываем продукты, которые приносят деньги
-            </motion.p>
-
-            {/* CTA Buttons */}
-            <motion.div
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-              animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-              transition={
-                shouldReduceMotion
-                  ? {}
-                  : { duration: 0.6, delay: 0.7 }
-              }
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-8 
-                         pointer-events-auto w-full sm:w-auto max-w-sm sm:max-w-none mx-auto"
-            >
-              {/* Primary CTA */}
-              <button
-                onClick={handleCtaClick}
-                className="group relative w-full sm:w-auto px-10 py-5 rounded-xl font-bold
-                           text-lg md:text-xl
-                           bg-gradient-to-r from-cyan-400 to-cyan-500 text-white
-                           shadow-lg shadow-cyan-500/50 
-                           hover:shadow-xl hover:shadow-cyan-500/60
-                           hover:scale-105 active:scale-95
-                           transition-all duration-200 overflow-hidden
-                           [text-shadow:_0_1px_2px_rgba(0,0,0,0.3)]
-                           focus-visible:outline-none focus-visible:ring-2 
-                           focus-visible:ring-cyan-400 focus-visible:ring-offset-2 
-                           focus-visible:ring-offset-black"
-                aria-label="Узнать стоимость проекта"
-              >
-                <span
-                  className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-500 
-                             rounded-xl blur opacity-50 group-hover:opacity-75 
-                             transition-opacity duration-300"
+          <div className="flex flex-col items-center justify-start max-w-6xl w-full text-center">
+              {/* Подложка только под заголовок и подзаголовок — тусклая, тёмная, малозаметная */}
+              <div className="relative w-full max-w-4xl mx-auto">
+                <div
+                  className="absolute inset-0 -inset-x-3 -inset-y-1
+                             bg-black/15 rounded-lg -z-10"
                 />
-                <span className="relative flex items-center justify-center gap-2">
-                  Узнать стоимость
-                  <ArrowRight
-                    className="w-5 h-5 group-hover:translate-x-1 
-                             transition-transform duration-200"
-                  />
-                </span>
-              </button>
-
-              {/* Secondary CTA */}
-              <button
-                onClick={scrollToCases}
-                className="group w-full sm:w-auto px-10 py-5 rounded-xl font-semibold
-                           text-lg md:text-xl
-                           bg-black/30 backdrop-blur-md
-                           border-2 border-[#404040] text-white
-                           hover:border-cyan-400 hover:bg-cyan-400/10
-                           transition-all duration-300
-                           focus-visible:outline-none focus-visible:ring-2 
-                           focus-visible:ring-cyan-400 focus-visible:ring-offset-2 
-                           focus-visible:ring-offset-black"
-                aria-label="Смотреть кейсы"
-              >
-                <span
-                  className="flex items-center justify-center gap-2 
-                             group-hover:text-cyan-400 transition-colors"
+                <motion.h1
+                  initial={shouldReduceMotion ? {} : fadeInUp.initial}
+                  animate={shouldReduceMotion ? {} : fadeInUp.animate}
+                  transition={
+                    shouldReduceMotion
+                      ? {}
+                      : { ...fadeInUp.transition, delay: 0.3 }
+                  }
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 
+                             font-extrabold leading-[1.15] tracking-tight text-white
+                             drop-shadow-[0_4px_20px_rgba(0,0,0,1)]"
                 >
-                  Смотреть кейсы
-                  <ArrowRight
-                    className="w-5 h-5 group-hover:translate-x-1 
-                             transition-transform duration-200"
-                  />
-                </span>
-              </button>
-            </motion.div>
+                  Создание сайтов,
+                  <br />
+                  Mini App и AI видео
+                </motion.h1>
+
+                <motion.p
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
+                  transition={
+                    shouldReduceMotion
+                      ? {}
+                      : { duration: 0.6, delay: 0.5 }
+                  }
+                  className="text-sm sm:text-base md:text-lg lg:text-xl 
+                             text-white font-medium leading-relaxed
+                             drop-shadow-[0_4px_16px_rgba(0,0,0,1)]
+                             max-w-2xl sm:max-w-3xl mx-auto mt-6 mb-6"
+                >
+                  Разрабатываем продукты, которые приносят деньги
+                </motion.p>
+              </div>
+
+              {/* Кнопки — без подложки */}
+              <motion.div
+                  initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
+                  animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
+                  transition={
+                    shouldReduceMotion
+                      ? {}
+                      : { duration: 0.6, delay: 0.7 }
+                  }
+                  className="flex flex-col sm:flex-row gap-y-3 sm:gap-x-4 sm:gap-y-0 lg:gap-x-6 justify-center mt-10
+                             pointer-events-auto w-full sm:w-auto max-w-sm sm:max-w-none mx-auto"
+                >
+                  {/* Primary CTA */}
+                  <button
+                    onClick={handleCtaClick}
+                    className="group relative w-full sm:w-auto px-8 py-4 sm:px-10 sm:py-5 rounded-xl font-bold
+                               text-base sm:text-lg md:text-xl
+                               bg-gradient-to-r from-cyan-400 to-cyan-500 text-white
+                               shadow-lg shadow-cyan-500/50 
+                               hover:shadow-xl hover:shadow-cyan-500/60
+                               hover:scale-105 active:scale-95
+                               transition-all duration-200 overflow-hidden
+                               [text-shadow:_0_1px_2px_rgba(0,0,0,0.3)]
+                               focus-visible:outline-none focus-visible:ring-2 
+                               focus-visible:ring-cyan-400 focus-visible:ring-offset-2 
+                               focus-visible:ring-offset-black"
+                    aria-label="Узнать стоимость проекта"
+                  >
+                    <span
+                      className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-500 
+                                 rounded-xl blur opacity-50 group-hover:opacity-75 
+                                 transition-opacity duration-300"
+                    />
+                    <span className="relative flex items-center justify-center gap-2">
+                      Узнать стоимость
+                      <ArrowRight
+                        className="w-5 h-5 group-hover:translate-x-1 
+                                 transition-transform duration-200"
+                      />
+                    </span>
+                  </button>
+
+                  {/* Secondary CTA */}
+                  <button
+                    onClick={scrollToCases}
+                    className="group w-full sm:w-auto px-8 py-4 sm:px-10 sm:py-5 rounded-xl font-semibold
+                               text-base sm:text-lg md:text-xl
+                               bg-black/30 backdrop-blur-md
+                               border-2 border-[#404040] text-white
+                               hover:border-cyan-400 hover:bg-cyan-400/10
+                               transition-all duration-300
+                               focus-visible:outline-none focus-visible:ring-2 
+                               focus-visible:ring-cyan-400 focus-visible:ring-offset-2 
+                               focus-visible:ring-offset-black"
+                    aria-label="Смотреть кейсы"
+                  >
+                    <span
+                      className="flex items-center justify-center gap-2 
+                                 group-hover:text-cyan-400 transition-colors"
+                    >
+                      Смотреть кейсы
+                      <ArrowRight
+                        className="w-5 h-5 group-hover:translate-x-1 
+                                 transition-transform duration-200"
+                      />
+                    </span>
+                  </button>
+                </motion.div>
           </div>
         </div>
       </section>

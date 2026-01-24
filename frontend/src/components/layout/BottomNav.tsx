@@ -17,7 +17,7 @@ interface NavTab {
 
 const TABS: NavTab[] = [
   { id: "home", label: "Главная", icon: Home, href: "/" },
-  { id: "catalog", label: "Каталог", icon: Grid3X3, href: "/products" },
+  { id: "catalog", label: "Каталог", icon: Grid3X3, href: "/services" },
   { id: "telegram", label: "Telegram", icon: Send, action: "telegram" },
   { id: "menu", label: "Меню", icon: Menu, action: "menu" },
 ];
@@ -34,7 +34,7 @@ export const BottomNav = memo(function BottomNav({ onMenuOpen }: BottomNavProps)
   const getActiveTab = () => {
     const path = location.pathname;
     if (path === "/") return "home";
-    if (path.startsWith("/products")) return "catalog";
+    if (path === "/services") return "catalog";
     if (path.startsWith("/work") || path.startsWith("/cases")) return "cases";
     return null;
   };

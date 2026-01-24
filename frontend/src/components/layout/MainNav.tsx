@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
@@ -9,20 +9,18 @@ import { BriefWizard } from "@/components/hero/BriefWizard";
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-dark.png";
 
-// Desktop nav - updated navigation
+// Desktop nav: Услуги, Портфолио, О нас, Контакты
 const navItems = [
-  { label: "Услуги", href: "/products", sectionId: "products" },
-  { label: "Кейсы", href: "/work", sectionId: "cases" },
-  { label: "Как работаем", href: "/process", sectionId: "process" },
-  { label: "Цены", href: "/products", sectionId: "products" },
+  { label: "Услуги", href: "/services", sectionId: "products" },
+  { label: "Портфолио", href: "/work", sectionId: "cases" },
+  { label: "О нас", href: "/about" },
+  { label: "Контакты", href: "/contact" },
 ];
 
-// Burger menu items (includes more pages)
+// Burger menu (same four links)
 const burgerMenuItems = [
-  { label: "Услуги", href: "/products" },
-  { label: "Кейсы", href: "/work" },
-  { label: "Как работаем", href: "/process" },
-  { label: "Цены", href: "/products" },
+  { label: "Услуги", href: "/services" },
+  { label: "Портфолио", href: "/work" },
   { label: "О нас", href: "/about" },
   { label: "Контакты", href: "/contact" },
 ];
@@ -100,12 +98,15 @@ export const MainNav = () => {
     if (location.pathname === '/' && sectionId && activeSection) {
       return sectionId === activeSection;
     }
-    // On other pages, use route-based highlighting
-    if (href === '/products') {
-      return location.pathname === '/products' || location.pathname.startsWith('/products/');
+    // Route-based highlighting
+    if (href === '/services') {
+      return location.pathname === '/services';
     }
     if (href === '/work') {
       return location.pathname === '/work' || location.pathname.startsWith('/work/');
+    }
+    if (href === '/about' || href === '/contact') {
+      return location.pathname === href;
     }
     return location.pathname === href;
   };
@@ -115,19 +116,20 @@ export const MainNav = () => {
 
   return (
     <>
-      {/* Fixed Header Container - Sticky with offset from top */}
+      {/* Fixed Header Container — только desktop (md+), на мобилке навигация внизу */}
       <header 
         className={cn(
+          "hidden md:block",
           "fixed left-1/2 -translate-x-1/2 z-[9999]",
           "w-[95%] max-w-7xl",
-          "lg:w-[95%] md:w-[97%] sm:w-[98%]",
+          "lg:w-[95%] md:w-[97%]",
           "transition-all duration-500 ease-out",
-          scrolled ? "top-4" : "top-6"
+          "top-3 sm:top-4"
         )}
         role="navigation"
         aria-label="Главная навигация"
       >
-        {/* Nav Container with backdrop blur */}
+        {/* Nav Container — низкая высота */}
         <motion.nav
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -137,17 +139,12 @@ export const MainNav = () => {
           }}
           className={cn(
             "flex items-center justify-between transition-all duration-500 ease-out",
-            "bg-black/30 backdrop-blur-xl",
+            "bg-black/40 backdrop-blur-2xl",
             "border border-gray-800/50",
-            "rounded-2xl",
+            "rounded-lg md:rounded-xl",
             "shadow-2xl shadow-black/50",
-            scrolled ? [
-              // Scrolled: Compact
-              "px-4 py-2",
-            ] : [
-              // Zero scroll: More padding
-              "px-6 py-3",
-            ]
+            "px-4 py-2 sm:px-5 sm:py-2 md:px-6 md:py-2",
+            "min-h-10 md:min-h-11"
           )}
         >
             {/* Logo */}
@@ -164,24 +161,21 @@ export const MainNav = () => {
                   alt="Neeklo Studio"
                   loading="eager"
                   decoding="async"
-                  className={cn(
-                    "w-auto transition-all duration-500 ease-out",
-                    scrolled ? "h-11 md:h-12" : "h-[60px] md:h-[68px] lg:h-20 xl:h-24"
-                  )}
+                  className="w-auto h-7 md:h-8 transition-all duration-500 ease-out"
                 />
               </motion.div>
             </Link>
 
             {/* Desktop Navigation - Center */}
-            <nav className="hidden lg:flex items-center justify-center flex-1 transition-all duration-500">
+            <nav className="hidden md:flex items-center justify-center flex-1 transition-all duration-500">
               <ul className="flex items-center gap-1">
                 {navItems.map((item) => (
                   <li key={item.href} className="relative">
                     <Link
                       to={item.href}
                       className={cn(
-                        "relative text-base font-medium rounded-full transition-all duration-300 ease-out overflow-hidden",
-                        scrolled ? "px-3 py-1.5" : "px-4 py-2",
+                        "relative text-sm font-medium rounded-full transition-all duration-300 ease-out overflow-hidden",
+                        "px-4 py-2",
                         isActive(item.href, item.sectionId) 
                           ? "text-background" 
                           : "text-foreground/60 hover:text-foreground hover:bg-foreground/5"
@@ -209,41 +203,24 @@ export const MainNav = () => {
             </nav>
 
             {/* Right Side */}
-            <div className={cn(
-              "flex items-center flex-shrink-0 transition-all duration-500",
-              scrolled ? "gap-2 pr-1" : "gap-3"
-            )}>
+            <div className="flex items-center flex-shrink-0 gap-2">
               {/* CTA - Desktop */}
               <motion.button
                 onClick={() => setIsBriefOpen(true)}
                 whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                 whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                 className={cn(
-                  "hidden md:flex items-center gap-2 rounded-xl font-bold transition-all duration-200",
-                  "text-base md:text-lg",
-                  "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black",
+                  "flex items-center gap-1.5 rounded-lg font-bold transition-all duration-200",
+                  "text-sm",
+                  "bg-gradient-to-r from-cyan-400 to-cyan-500 text-white",
                   "hover:shadow-lg hover:shadow-cyan-500/30",
-                  scrolled ? "px-4 py-2" : "px-6 py-3"
+                  "px-5 py-3"
                 )}
                 aria-label="Узнать стоимость проекта"
               >
-                <span className={scrolled ? "hidden xl:inline" : ""}>Узнать стоимость</span>
-                <ArrowUpRight className={cn("transition-all", scrolled ? "w-4 h-4" : "w-5 h-5")} />
+                <span className="hidden lg:inline">Узнать стоимость</span>
+                <ArrowUpRight className="w-4 h-4" />
               </motion.button>
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className={cn(
-                  "lg:hidden flex items-center justify-center rounded-full transition-colors duration-200",
-                  "text-foreground hover:text-foreground hover:bg-foreground/10",
-                  "bg-foreground/5",
-                  scrolled ? "w-9 h-9" : "w-11 h-11"
-                )}
-                aria-label="Открыть меню"
-              >
-                <Menu className={cn("transition-all", scrolled ? "w-5 h-5" : "w-6 h-6")} />
-              </button>
             </div>
           </motion.nav>
       </header>
@@ -258,7 +235,7 @@ export const MainNav = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+              className="fixed inset-0 bg-black/50 backdrop-blur-lg z-[100]"
               onClick={() => setIsMobileMenuOpen(false)}
             />
 
@@ -271,7 +248,7 @@ export const MainNav = () => {
               className="fixed inset-y-0 right-0 w-[85vw] max-w-[320px] z-[101] bg-background border-l border-border/20 flex flex-col shadow-2xl"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border/20">
+              <div className="flex items-center justify-between p-5 border-b border-border/20">
                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
                   <img src={currentLogo} alt="Neeklo Studio" loading="lazy" decoding="async" className="h-[60px]" />
                 </Link>
@@ -285,9 +262,9 @@ export const MainNav = () => {
               </div>
 
               {/* Nav - using burgerMenuItems for full navigation */}
-              <nav className="flex-1 overflow-y-auto py-4">
+              <nav className="flex-1 overflow-y-auto py-5">
                 <motion.ul 
-                  className="space-y-1 px-3"
+                  className="space-y-1 px-5"
                   initial="hidden"
                   animate="visible"
                   variants={{
@@ -321,7 +298,7 @@ export const MainNav = () => {
                         to={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
-                          "block px-4 py-3 rounded-xl min-h-[48px] flex items-center",
+                          "block px-5 py-4 rounded-xl min-h-[48px] flex items-center",
                           "text-base md:text-lg font-medium transition-all duration-200",
                           location.pathname === item.href
                             ? "bg-foreground text-background"
@@ -336,14 +313,14 @@ export const MainNav = () => {
               </nav>
 
               {/* CTA */}
-              <div className="p-4 border-t border-border/20">
+              <div className="p-5 border-t border-border/20">
                 <button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                     setIsBriefOpen(true);
                   }}
                   className={cn(
-                    "flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-xl min-h-[48px]",
+                    "flex items-center justify-center gap-2 w-full px-6 py-4 rounded-xl min-h-[48px]",
                     "bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-bold",
                     "text-base md:text-lg",
                     "transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/30"

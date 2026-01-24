@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { PageTransition } from "@/components/layout/PageTransition";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { MainNav } from "@/components/layout/MainNav";
@@ -19,7 +19,6 @@ import { useScrollAnimations } from "@/hooks/useScrollAnimations";
 import Index from "./pages/Index";
 
 // Lazy load pages for code splitting
-// Services removed - unified under Products
 const Work = lazy(() => import("./pages/Work"));
 const WorkDetail = lazy(() => import("./pages/WorkDetail"));
 const About = lazy(() => import("./pages/About"));
@@ -29,7 +28,7 @@ const Terms = lazy(() => import("./pages/Terms"));
 const Offer = lazy(() => import("./pages/Offer"));
 const Consent = lazy(() => import("./pages/Consent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const Products = lazy(() => import("./pages/Products"));
+const Services = lazy(() => import("./pages/Services"));
 const Cases = lazy(() => import("./pages/Cases"));
 const Process = lazy(() => import("./pages/Process"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -63,7 +62,7 @@ const queryClient = new QueryClient({
 // Navigation items for mobile menu
 const NAV_ITEMS = [
   { label: "Главная", href: "/" },
-  { label: "Продукты", href: "/products" },
+  { label: "Услуги", href: "/services" },
   { label: "Кейсы", href: "/work" },
   { label: "Процесс", href: "/process" },
   { label: "О нас", href: "/about" },
@@ -79,7 +78,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/products" element={<Products />} />
+      <Route path="/services" element={<Services />} />
+      <Route path="/products" element={<Navigate to="/services" replace />} />
       <Route path="/work" element={<Work />} />
       <Route path="/work/:slug" element={<WorkDetail />} />
       <Route path="/cases" element={<Cases />} />

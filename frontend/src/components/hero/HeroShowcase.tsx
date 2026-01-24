@@ -14,11 +14,11 @@ export const HeroShowcase = memo(function HeroShowcase() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-8 max-w-[320px]"
+          className="flex flex-col items-center text-center mb-8 max-w-[320px] mx-auto"
         >
           {/* H1 - clean typography, no orphans */}
           <h1 
-            className="text-[26px] sm:text-[30px] font-semibold tracking-[-0.02em] text-foreground mb-3 leading-[1.2]"
+            className="text-[25px] sm:text-[29px] font-semibold tracking-[-0.02em] text-foreground mb-3 leading-[1.28]"
             style={{ textWrap: 'balance' }}
           >
             Сайты, чат-боты{" "}
@@ -44,11 +44,11 @@ export const HeroShowcase = memo(function HeroShowcase() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-12"
+          className="flex flex-col items-center text-center mb-12 mx-auto"
         >
           {/* Desktop Headline */}
           <h1 
-            className="text-[48px] xl:text-[56px] font-semibold tracking-[-0.03em] text-foreground mb-4 leading-[1.1]"
+            className="text-[48px] xl:text-[56px] font-semibold tracking-[-0.03em] text-foreground mb-4 leading-[1.15]"
           >
             Сайты, чат-боты и видео
             <br />

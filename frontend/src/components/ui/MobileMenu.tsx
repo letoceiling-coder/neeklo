@@ -74,7 +74,7 @@ export const MobileMenu = ({ isOpen, onClose, navItems, isActive }: MobileMenuPr
                       href={item.href}
                       onClick={(e) => handleNavClick(e, item.href)}
                       className={cn(
-                        "flex items-center justify-between py-4 px-4 rounded-xl text-base font-medium transition-all duration-200",
+                        "flex items-center justify-between py-4 px-5 rounded-xl text-base font-medium transition-all duration-200",
                         isActive(item.href)
                           ? "bg-primary/10 text-primary"
                           : "text-foreground/80 hover:bg-secondary/50 hover:text-foreground"
@@ -96,7 +96,7 @@ export const MobileMenu = ({ isOpen, onClose, navItems, isActive }: MobileMenuPr
               <a href="https://t.me/neeklo" target="_blank" rel="noopener noreferrer" className="block">
                 <motion.button
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className="w-full py-3 px-5 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-accent text-primary-foreground flex items-center justify-center gap-2 shadow-lg min-h-[40px]"
+                  className="w-full py-4 px-6 rounded-lg font-medium text-sm transition-all duration-300 bg-gradient-to-r from-primary to-accent text-primary-foreground flex items-center justify-center gap-2 shadow-lg min-h-[40px]"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Обсудить проект

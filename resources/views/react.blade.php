@@ -5,100 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Laravel') }}</title>
-    
+
     @php
-        // Всегда используем собранные файлы (без dev сервера)
-        $indexHtmlPath = public_path('frontend/index.html');
-        $assetsPath = public_path('frontend/assets');
+        // Локальная разработка: загрузка с Vite dev server (порт 8080)
+        $viteDevUrl = rtrim(env('VITE_DEV_SERVER_URL', ''), '/');
+        $useViteDev = (config('app.env') === 'local' && $viteDevUrl !== '');
+
         $cssFiles = [];
         $jsFiles = [];
-        
-        // Пытаемся найти файлы через index.html или через поиск в assets
-        if (file_exists($indexHtmlPath)) {
-            $htmlContent = file_get_contents($indexHtmlPath);
-            
-            // Извлекаем пути к CSS файлам
-            preg_match_all('/<link[^>]*href=["\']([^"\']*\.css[^"\']*)["\'][^>]*>/i', $htmlContent, $cssMatches);
-            if (!empty($cssMatches[1])) {
-                foreach ($cssMatches[1] as $cssPath) {
-                    $cssFiles[] = $cssPath;
+
+        if (!$useViteDev) {
+            $indexHtmlPath = public_path('frontend/index.html');
+            $assetsPath = public_path('frontend/assets');
+
+            if (file_exists($indexHtmlPath)) {
+                $htmlContent = file_get_contents($indexHtmlPath);
+                preg_match_all('/<link[^>]*href=["\']([^"\']*\.css[^"\']*)["\'][^>]*>/i', $htmlContent, $cssMatches);
+                if (!empty($cssMatches[1])) {
+                    foreach ($cssMatches[1] as $cssPath) {
+                        if (!str_contains($cssPath, 'fonts.googleapis')) $cssFiles[] = $cssPath;
+                    }
+                }
+                preg_match_all('/<script[^>]*src=["\']([^"\']*\.js[^"\']*)["\'][^>]*>/i', $htmlContent, $jsMatches);
+                if (!empty($jsMatches[1])) {
+                    foreach ($jsMatches[1] as $jsPath) {
+                        if (!str_contains($jsPath, 'registerSW')) $jsFiles[] = $jsPath;
+                    }
                 }
             }
-            
-            // Извлекаем пути к JS файлам
-            preg_match_all('/<script[^>]*src=["\']([^"\']*\.js[^"\']*)["\'][^>]*>/i', $htmlContent, $jsMatches);
-            if (!empty($jsMatches[1])) {
-                foreach ($jsMatches[1] as $jsPath) {
-                    $jsFiles[] = $jsPath;
+
+            if (empty($jsFiles) && is_dir($assetsPath)) {
+                $files = glob($assetsPath . '/index-*.js');
+                if (!empty($files)) {
+                    foreach ($files as $file) {
+                        $jsFiles[] = '/assets/' . basename($file);
+                    }
                 }
             }
-        }
-        
-        // Если не нашли через index.html, ищем файлы по паттерну
-        if (empty($jsFiles) && is_dir($assetsPath)) {
-            $files = glob($assetsPath . '/index-*.js');
-            if (!empty($files)) {
-                foreach ($files as $file) {
-                    $jsFiles[] = 'frontend/assets/' . basename($file);
-                }
-            }
-        }
-        
-        if (empty($cssFiles) && is_dir($assetsPath)) {
-            $files = glob($assetsPath . '/index-*.css');
-            if (!empty($files)) {
-                foreach ($files as $file) {
-                    $cssFiles[] = 'frontend/assets/' . basename($file);
+            if (empty($cssFiles) && is_dir($assetsPath)) {
+                $files = glob($assetsPath . '/index-*.css');
+                if (!empty($files)) {
+                    foreach ($files as $file) {
+                        $cssFiles[] = '/assets/' . basename($file);
+                    }
                 }
             }
         }
     @endphp
-    
-    @if(!empty($jsFiles))
-        <!-- Подключение собранных файлов React -->
-        {{-- Подключаем CSS файлы --}}
+
+    @if($useViteDev)
+        {{-- Локальная разработка: Vite dev server с HMR --}}
+        <script type="module" src="{{ $viteDevUrl }}/@vite/client"></script>
+        <script type="module" src="{{ $viteDevUrl }}/src/main.tsx"></script>
+    @elseif(!empty($jsFiles))
+        {{-- Подключение собранных файлов React --}}
         @foreach($cssFiles as $css)
             @if(str_starts_with($css, 'http://') || str_starts_with($css, 'https://'))
                 <link rel="stylesheet" href="{{ $css }}">
-            @elseif(str_starts_with($css, '/frontend/'))
-                <link rel="stylesheet" href="{{ $css }}">
-            @elseif(str_starts_with($css, '/assets/'))
-                <link rel="stylesheet" href="{{ $css }}">
-            @elseif(str_starts_with($css, '/'))
-                <link rel="stylesheet" href="{{ $css }}">
             @else
-                <link rel="stylesheet" href="{{ asset($css) }}">
+                <link rel="stylesheet" href="{{ str_starts_with($css, '/') ? $css : asset($css) }}">
             @endif
         @endforeach
-        
-        {{-- Подключаем JS файлы --}}
         @foreach($jsFiles as $js)
             @if(str_starts_with($js, 'http://') || str_starts_with($js, 'https://'))
                 <script type="module" src="{{ $js }}"></script>
-            @elseif(str_starts_with($js, '/frontend/'))
-                <script type="module" src="{{ $js }}"></script>
-            @elseif(str_starts_with($js, '/assets/'))
-                <script type="module" src="{{ $js }}"></script>
-            @elseif(str_starts_with($js, '/'))
-                <script type="module" src="{{ $js }}"></script>
             @else
-                <script type="module" src="{{ asset($js) }}"></script>
+                <script type="module" src="{{ str_starts_with($js, '/') ? $js : asset($js) }}"></script>
             @endif
         @endforeach
     @else
-        <!-- React приложение не собрано. Выполните сборку: npm run build:react -->
-        <div style="padding: 20px; text-align: center; font-family: Arial;">
-            <h2>React приложение не собрано</h2>
-            <p>Выполните сборку:</p>
-            <pre style="background: #f5f5f5; padding: 10px; display: inline-block;">npm run build:react</pre>
-        </div>
-        <script>
-            console.error('React приложение не собрано. Выполните: npm run build:react');
-        </script>
+        {{-- React не собран и Vite dev не задан — подсказка в body --}}
+        <script>console.warn('React: задайте VITE_DEV_SERVER_URL и запустите Vite ИЛИ выполните npm run build:react');</script>
     @endif
 </head>
 
 <body>
-    <div id="root"></div>
+    @if(!$useViteDev && empty($jsFiles))
+        <style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#e5e5e5;font-family:system-ui,sans-serif;}</style>
+        <div style="text-align:center;max-width:420px;padding:24px;">
+            <h2 style="margin-bottom:12px;">React приложение не подключено</h2>
+            <p style="margin-bottom:16px;opacity:.8;">Для локального просмотра:</p>
+            <p style="margin-bottom:8px;"><strong>1.</strong> В <code>.env</code>: <code>VITE_DEV_SERVER_URL=http://localhost:8080</code></p>
+            <p style="margin-bottom:8px;"><strong>2.</strong> Терминал 1: <code>php artisan serve</code></p>
+            <p style="margin-bottom:8px;"><strong>3.</strong> Терминал 2: <code>cd frontend && npm run dev</code></p>
+            <p style="margin-top:16px;opacity:.8;">Или соберите: <code>npm run build:react</code></p>
+        </div>
+    @else
+        <div id="root"></div>
+    @endif
 </body>
 </html>
