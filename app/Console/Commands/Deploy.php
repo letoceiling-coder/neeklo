@@ -120,10 +120,14 @@ class Deploy extends Command
             return;
         }
 
-        $process = Process::run('npm run build:all');
+        $process = Process::timeout(600)->run('npm run build:all'); // 10 минут
 
         if (!$process->successful()) {
-            throw new \Exception("Ошибка сборки фронтенда:\n" . $process->errorOutput());
+            $err = $process->errorOutput();
+            if (str_contains($err, 'timeout') || str_contains($err, 'exceeded')) {
+                throw new \Exception("Сборка фронтенда превысила 10 минут. Проверьте производительность или увеличьте таймаут в app/Console/Commands/Deploy.php.");
+            }
+            throw new \Exception("Ошибка сборки фронтенда:\n" . $err);
         }
 
         // Проверяем наличие собранных файлов
