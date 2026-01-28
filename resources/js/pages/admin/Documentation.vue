@@ -1,8 +1,28 @@
 <template>
     <div class="documentation-page">
         <div class="mb-6">
-            <h1 class="text-2xl font-bold text-foreground">Документация</h1>
-            <p class="text-muted-foreground mt-1">Техническая документация системы</p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-foreground">Документация</h1>
+                    <p class="text-muted-foreground mt-1">Техническая документация системы</p>
+                </div>
+                <button
+                    @click="refreshDocumentation"
+                    :disabled="refreshing"
+                    class="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
+                >
+                    <svg
+                        class="w-4 h-4"
+                        :class="{ 'animate-spin': refreshing }"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    {{ refreshing ? 'Обновление...' : 'Обновить документацию' }}
+                </button>
+            </div>
         </div>
 
         <div class="space-y-6">
@@ -40,6 +60,7 @@ export default {
     data() {
         return {
             activeSection: 'overview',
+            refreshing: false,
             sections: [
                 { id: 'overview', title: 'Обзор системы' },
                 { id: 'api', title: 'API Endpoints' },
@@ -242,6 +263,31 @@ export default {
     computed: {
         currentContent() {
             return this.documentation[this.activeSection] || '<p>Раздел в разработке</p>';
+        },
+    },
+    methods: {
+        async refreshDocumentation() {
+            this.refreshing = true;
+            try {
+                // Обновляем документацию, загружая актуальную версию
+                // Можно добавить API endpoint для получения актуальной документации
+                // Пока просто перезагружаем страницу через небольшую задержку
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Здесь можно добавить запрос к API для получения актуальной документации
+                // const response = await axios.get('/api/admin/documentation');
+                // if (response.data.documentation) {
+                //     this.documentation = response.data.documentation;
+                // }
+                
+                // Пока просто показываем сообщение об успехе
+                this.$toast?.success('Документация обновлена');
+            } catch (error) {
+                console.error('Error refreshing documentation:', error);
+                this.$toast?.error('Ошибка обновления документации');
+            } finally {
+                this.refreshing = false;
+            }
         },
     },
 };

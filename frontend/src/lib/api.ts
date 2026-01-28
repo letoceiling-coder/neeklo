@@ -135,3 +135,108 @@ export async function sendTelegramMessage(data: {
   };
 }
 
+// --- Cases API (публичные и админ) ---
+
+const getAuthHeaders = (): Record<string, string> => {
+  const t = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+  if (t) return { Authorization: `Bearer ${t}` };
+  return {};
+};
+
+/** Базовый URL бэкенда для /storage (если фронт на другом origin). */
+export function resolveStorageUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  const base = import.meta.env.VITE_APP_URL || (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '') || '';
+  return base + (url.startsWith('/') ? url : '/' + url);
+}
+
+/** Список кейсов (публичный) */
+export async function getCases(): Promise<{ success: boolean; data?: any[]; message?: string }> {
+  const r = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/cases`, {
+    headers: { Accept: 'application/json' },
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data || [] };
+}
+
+/** Кейс по slug (публичный) */
+export async function getCaseBySlug(slug: string): Promise<{ success: boolean; data?: any; message?: string }> {
+  const r = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/cases/slug/${encodeURIComponent(slug)}`, {
+    headers: { Accept: 'application/json' },
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data };
+}
+
+const apiV1 = (p: string) => (import.meta.env.VITE_API_URL || '/api').replace(/\/?$/, '') + '/v1' + p;
+
+/** Кейс по id (админ) */
+export async function getCaseById(id: number): Promise<{ success: boolean; data?: any; message?: string }> {
+  const r = await fetch(apiV1(`/cases/${id}`), { headers: { Accept: 'application/json', ...getAuthHeaders() } });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data };
+}
+
+/** Создать кейс (админ) */
+export async function createCase(v: { slug: string; title: string; category?: string; year?: number; featured?: boolean; description?: string; meta?: object }): Promise<{ success: boolean; data?: any; message?: string }> {
+  const r = await fetch(apiV1('/cases'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(v),
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data };
+}/** Обновить кейс (админ) */
+export async function updateCase(id: number, v: Partial<{ slug: string; title: string; category: string; year: number; featured: boolean; description: string; meta: object }>): Promise<{ success: boolean; data?: any; message?: string }> {
+  const r = await fetch(apiV1(`/cases/${id}`), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify(v),
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data };
+}
+
+/** Загрузить медиа (админ). type: 'image' | 'video' */
+export async function uploadCaseMedia(caseId: number, file: File, type: 'image' | 'video'): Promise<{ success: boolean; data?: any; message?: string }> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('type', type);
+  const r = await fetch(apiV1(`/cases/${caseId}/media`), {
+    method: 'POST',
+    headers: { Accept: 'application/json', ...getAuthHeaders() },
+    body: fd,
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true, data: d.data };
+}
+
+/** Удалить медиа (админ) */
+export async function deleteCaseMedia(mediaId: number): Promise<{ success: boolean; message?: string }> {
+  const r = await fetch(apiV1(`/cases/media/${mediaId}`), {
+    method: 'DELETE',
+    headers: { Accept: 'application/json', ...getAuthHeaders() },
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true };
+}
+
+/** Изменить порядок медиа (админ). order — массив id. */
+export async function reorderCaseMedia(caseId: number, order: number[]): Promise<{ success: boolean; message?: string }> {
+  const r = await fetch(apiV1(`/cases/${caseId}/media/reorder`), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...getAuthHeaders() },
+    body: JSON.stringify({ order }),
+  });
+  const d = await r.json();
+  if (!r.ok) return { success: false, message: d.message || 'Ошибка' };
+  return { success: true };
+}

@@ -83,6 +83,16 @@ Backend система для Telegram Mini App приложений на баз
 - Git Hooks
 - Автоматический деплой
 
+## 📐 Схема проекта (сайт + админка)
+
+| Часть | Технологии | Маршруты | Сборка |
+|-------|------------|----------|--------|
+| **Публичный сайт** | React, Vite, React Router | `/`, `/services`, `/work`, `/about`, `/contact`, `/blog`, `/process`, … | `cd frontend && npm run build` → `public/frontend/` |
+| **Админ-панель** | Vue 3, Vuex, Vue Router, Vite | `/admin`, `/admin/login`, `/admin/cases`, … | `npm run build` (в корне) → `public/build/` |
+| **Backend** | Laravel, Sanctum, Blade | `/api/*`, отдача React/Admin HTML | — |
+
+Локально: React и админка доступны через **http://localhost:8080** (Vite dev). В production всё отдаёт Laravel из `public/`.
+
 ## 📁 Структура проекта
 
 ```
@@ -136,11 +146,11 @@ project/
 
 ### Требования
 
-- PHP 8.2+
+- PHP 8.2+ (рекомендуется 8.4)
 - Composer 2.0+
-- Node.js 18.0+
-- MySQL 8.0+ или PostgreSQL 13+
-- SSL-сертификат (обязательно для Telegram Mini App)
+- Node.js 18+ (20 рекомендуется)
+- MySQL 8.0+ / PostgreSQL 13+ или SQLite
+- SSL-сертификат для production (обязательно для Telegram Mini App)
 
 ### Установка
 
@@ -150,69 +160,70 @@ git clone https://github.com/letoceiling-coder/neeklo.git
 cd neeklo
 ```
 
-**💡 Установка конкретной версии:**
-Если вам нужна конкретная стабильная версия вместо последней версии из ветки main, используйте git теги. См. подробную документацию в [VERSIONING.md](VERSIONING.md).
-
-```bash
-# Клонировать сразу версию 1.0.0
-git clone --branch v1.0.0 --depth 1 https://github.com/letoceiling-coder/neeklo.git
-
-# Или в существующем репозитории
-git fetch --tags
-git checkout v1.0.0
-```
-
-2. **Установите зависимости:**
-```bash
-composer install
-npm install
-```
-
-3. **Настройте окружение:**
+2. **Окружение и зависимости:**
 ```bash
 cp .env.example .env
 php artisan key:generate
+composer install
+npm install
+cd frontend && npm install && cd ..
 ```
 
-4. **Настройте базу данных в `.env`:**
+3. **База данных в `.env`** (для локальной разработки можно SQLite):
 ```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=your_database_name
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
+DB_CONNECTION=sqlite
+# или MySQL:
+# DB_CONNECTION=mysql
+# DB_HOST=127.0.0.1
+# DB_PORT=3306
+# DB_DATABASE=neeklo
+# DB_USERNAME=root
+# DB_PASSWORD=
 ```
 
-5. **Выполните миграции и seeders:**
+4. **Миграции:**
 ```bash
+touch database/database.sqlite   # если SQLite
 php artisan migrate
 php artisan db:seed
 ```
 
-6. **Настройте Telegram бота в `.env`:**
-```env
-TELEGRAM_BOT_TOKEN=your_bot_token_here
-```
-
-7. **Настройте систему подписки (опционально):**
-```env
-SUBSCRIPTION_API_URL=https://crm.siteaccess.ru/api/v1/subscription/check
-SUBSCRIPTION_API_TOKEN=your_subscription_api_token
-```
-
-8. **Настройте деплой (опционально):**
-```env
-DEPLOY_TOKEN=your_deploy_token
-DEPLOY_SERVER_URL=https://your-domain.com
-```
-
-9. **Соберите фронтенд:**
+5. **Локальная разработка (сайт + админка):**
 ```bash
-npm run build:admin
+# В .env: VITE_DEV_SERVER_URL=http://localhost:8080
+npm run dev:local
+```
+- Сайт (React): **http://localhost:8080**
+- Админка (Vue): **http://localhost:8080/admin**
+- API и статика проксируются на Laravel (порт 8000).
+
+**Или два терминала:**
+```bash
+# Терминал 1
+php artisan serve
+
+# Терминал 2
+cd frontend && npm run dev
+```
+Откройте http://localhost:8080 и http://localhost:8080/admin .
+
+6. **Сборка для production (деплой):**
+```bash
+npm run build:all
+```
+Собирает админку (Vue → `public/build/`) и React (→ `public/frontend/`).
+
+7. **Остальные настройки в `.env`** (по необходимости):
+```env
+TELEGRAM_BOT_TOKEN=...
+SUBSCRIPTION_API_URL=...
+SUBSCRIPTION_API_TOKEN=...
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1
 ```
 
-10. **Настройте веб-сервер** (Apache/Nginx) и SSL-сертификат
+Полный порядок деплоя на сервер: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+**💡 Установка конкретной версии:** см. [VERSIONING.md](VERSIONING.md).
 
 ## 📚 API Документация
 
@@ -265,20 +276,14 @@ Authorization: Bearer {token}
 
 Роли назначаются через админ-панель в разделе "Роли" (только для администраторов).
 
-## 🔄 Автоматический деплой
+## 🔄 CI/CD и деплой
 
 ### GitHub Actions
 
-При каждом push в ветку `main` автоматически запускается деплой на сервер.
+- **CI** (при push/PR в `main` или `develop`): установка зависимостей, сборка Admin и React, миграции. Файл: [.github/workflows/ci.yml](.github/workflows/ci.yml).
+- **Deploy** (при push в `main`): полная сборка и загрузка артефактов. Опциональный SSH-деплой через переменную `DEPLOY_ENABLED` и секреты `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`. Файл: [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
 
-**Настройка:**
-1. Добавьте Secrets в GitHub:
-   - `DEPLOY_SERVER_URL` - URL вашего сервера
-   - `DEPLOY_TOKEN` - Токен для авторизации деплоя
-
-2. Токен `DEPLOY_TOKEN` должен быть одинаковым в:
-   - GitHub Secrets
-   - `.env` файле на сервере
+Подробности по шагам деплоя на сервер: **[DEPLOYMENT.md](DEPLOYMENT.md)**.
 
 ### GitHub Webhook
 

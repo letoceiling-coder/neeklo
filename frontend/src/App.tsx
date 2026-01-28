@@ -34,6 +34,8 @@ const Consent = lazy(() => import("./pages/Consent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Cases = lazy(() => import("./pages/Cases"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminCasesList = lazy(() => import("./pages/admin/AdminCasesList"));
+const AdminCaseEdit = lazy(() => import("./pages/admin/AdminCaseEdit"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogArticle = lazy(() => import("./pages/blog/BlogArticle"));
 
@@ -94,7 +96,8 @@ function AppRoutes() {
       <Route path="/terms" element={<Terms />} />
       <Route path="/offer" element={<Offer />} />
       <Route path="/consent" element={<Consent />} />
-      <Route path="/admin" element={<Admin />} />
+      <Route path="/docs" element={<Admin />} />
+      <Route path="/documentation" element={<Admin />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogArticle />} />
       

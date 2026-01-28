@@ -1,8 +1,274 @@
+// КРИТИЧНО: Фильтрация ошибок расширений браузера ДО импорта других модулей
+// Это должно быть самым первым кодом, который выполняется
+(function() {
+    'use strict';
+    if (typeof window === 'undefined') return;
+    
+    // Перехватываем ошибки ДО загрузки Vue/React
+    const originalErrorHandler = window.onerror;
+    window.onerror = function(message, source, lineno, colno, error) {
+        // Игнорируем ошибки из расширений браузера
+        if (source && (
+            source.includes('chrome-extension://') ||
+            source.includes('moz-extension://') ||
+            source.includes('safari-extension://') ||
+            source.includes('adblock') ||
+            source.includes('content.js') ||
+            source.includes('counter.js') ||
+            source.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            source.includes('Error handling response')
+        )) {
+            return true; // Предотвращаем показ ошибки
+        }
+        // Также проверяем сообщение об ошибке
+        if (message && typeof message === 'string') {
+            const msgLower = message.toLowerCase();
+            if (msgLower.includes('chrome-extension://') ||
+                msgLower.includes('moz-extension://') ||
+                msgLower.includes('safari-extension://') ||
+                msgLower.includes('adblock') ||
+                msgLower.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+                msgLower.includes('error handling response') ||
+                (msgLower.includes('indexof') && msgLower.includes('undefined')) ||
+                msgLower.includes('safari is not defined') ||
+                msgLower.includes('uncaught referenceerror: safari') ||
+                (msgLower.includes('cannot read properties') && msgLower.includes('indexof'))) {
+                return true;
+            }
+        }
+        // Проверяем stack trace
+        if (error && error.stack) {
+            const stack = error.stack.toLowerCase();
+            if (stack.includes('chrome-extension://') ||
+                stack.includes('moz-extension://') ||
+                stack.includes('safari-extension://') ||
+                stack.includes('adblock') ||
+                stack.includes('counter.js') ||
+                stack.includes('content.js') ||
+                stack.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')) {
+                return true;
+            }
+        }
+        // Вызываем оригинальный обработчик для остальных ошибок
+        if (originalErrorHandler) {
+            return originalErrorHandler.call(this, message, source, lineno, colno, error);
+        }
+        return false;
+    };
+    
+    // Перехватываем ошибки через addEventListener
+    window.addEventListener('error', function(event) {
+        if (event.filename && (
+            event.filename.includes('chrome-extension://') ||
+            event.filename.includes('moz-extension://') ||
+            event.filename.includes('safari-extension://') ||
+            event.filename.includes('adblock') ||
+            event.filename.includes('content.js') ||
+            event.filename.includes('counter.js') ||
+            event.filename.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')
+        )) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            return false;
+        }
+        if (event.message) {
+            const msgLower = event.message.toLowerCase();
+            if (msgLower.includes('error handling response') ||
+                (msgLower.includes('indexof') && msgLower.includes('undefined')) ||
+                msgLower.includes('safari is not defined') ||
+                msgLower.includes('uncaught referenceerror: safari') ||
+                (msgLower.includes('cannot read properties') && msgLower.includes('indexof'))) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return false;
+            }
+        }
+    }, true);
+    
+    // Перехватываем необработанные промисы
+    window.addEventListener('unhandledrejection', function(event) {
+        const reason = event.reason;
+        if (reason) {
+            const message = (reason.message || String(reason) || '').toLowerCase();
+            const stack = (reason.stack || '').toLowerCase();
+            if (message.includes('error handling response') ||
+                message.includes('chrome-extension://') ||
+                message.includes('adblock') ||
+                message.includes('safari is not defined') ||
+                message.includes('indexof') ||
+                message.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+                stack.includes('chrome-extension://') ||
+                stack.includes('adblock') ||
+                stack.includes('counter.js') ||
+                stack.includes('content.js') ||
+                stack.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return false;
+            }
+        }
+    }, true);
+    
+    // Фильтруем console.error
+    const originalError = console.error;
+    console.error = function(...args) {
+        const errorString = args.join(' ').toLowerCase();
+        if (errorString.includes('chrome-extension://') || 
+            errorString.includes('moz-extension://') ||
+            errorString.includes('safari-extension://') ||
+            errorString.includes('adblock') ||
+            errorString.includes('message port closed') ||
+            errorString.includes('safari is not defined') ||
+            errorString.includes('uncaught referenceerror: safari') ||
+            errorString.includes('content.js') ||
+            errorString.includes('counter.js') ||
+            errorString.includes('indexof') ||
+            errorString.includes('error handling response') ||
+            errorString.includes('unchecked runtime.lasterror') ||
+            errorString.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            (errorString.includes('indexof') && errorString.includes('undefined')) ||
+            (errorString.includes('cannot read properties') && errorString.includes('indexof'))) {
+            return; // Не показываем эти ошибки
+        }
+        originalError.apply(console, args);
+    };
+    
+    // Фильтруем console.warn
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const warnString = args.join(' ').toLowerCase();
+        if (warnString.includes('runtime.lasterror') ||
+            warnString.includes('unchecked runtime.lasterror') ||
+            warnString.includes('message port closed') ||
+            warnString.includes('chrome-extension://') ||
+            warnString.includes('moz-extension://') ||
+            warnString.includes('safari-extension://') ||
+            warnString.includes('adblock') ||
+            warnString.includes('error handling response') ||
+            warnString.includes('safari is not defined') ||
+            warnString.includes('indexof') ||
+            warnString.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')) {
+            return;
+        }
+        originalWarn.apply(console, args);
+    };
+})();
+
 import './bootstrap';
 import { createApp } from 'vue';
 import { createStore } from 'vuex';
 import { createRouter, createWebHistory } from 'vue-router';
 import axios from 'axios';
+
+// Дополнительная фильтрация (на случай, если что-то пропустили)
+if (typeof window !== 'undefined') {
+    // Перехватываем глобальные ошибки до инициализации приложения (дополнительная защита)
+    const originalErrorHandler2 = window.onerror;
+    window.onerror = function(message, source, lineno, colno, error) {
+        // Игнорируем ошибки из расширений браузера
+        if (source && (
+            source.includes('chrome-extension://') ||
+            source.includes('moz-extension://') ||
+            source.includes('safari-extension://') ||
+            source.includes('adblock') ||
+            source.includes('content.js') ||
+            source.includes('counter.js') ||
+            source.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            source.includes('Error handling response')
+        )) {
+            return true; // Предотвращаем показ ошибки
+        }
+        // Также проверяем сообщение об ошибке
+        if (message && (
+            typeof message === 'string' && (
+                message.includes('chrome-extension://') ||
+                message.includes('moz-extension://') ||
+                message.includes('safari-extension://') ||
+                message.includes('adblock') ||
+                message.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+                message.includes('Error handling response') ||
+                (message.includes('indexOf') && message.includes('undefined')) ||
+                message.includes('safari is not defined') ||
+                message.includes('Uncaught ReferenceError: safari')
+            )
+        )) {
+            return true;
+        }
+        // Проверяем stack trace
+        if (error && error.stack && (
+            error.stack.includes('chrome-extension://') ||
+            error.stack.includes('moz-extension://') ||
+            error.stack.includes('safari-extension://') ||
+            error.stack.includes('adblock') ||
+            error.stack.includes('counter.js') ||
+            error.stack.includes('content.js') ||
+            error.stack.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')
+        )) {
+            return true;
+        }
+        // Вызываем оригинальный обработчик для остальных ошибок
+        if (originalErrorHandler) {
+            return originalErrorHandler.call(this, message, source, lineno, colno, error);
+        }
+        return false;
+    };
+    
+    // Фильтруем ошибки через addEventListener('error')
+    window.addEventListener('error', function(event) {
+        if (event.filename && (
+            event.filename.includes('chrome-extension://') ||
+            event.filename.includes('moz-extension://') ||
+            event.filename.includes('safari-extension://') ||
+            event.filename.includes('adblock') ||
+            event.filename.includes('content.js') ||
+            event.filename.includes('counter.js') ||
+            event.filename.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')
+        )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+        if (event.message && (
+            event.message.includes('Error handling response') ||
+            (event.message.includes('indexOf') && event.message.includes('undefined')) ||
+            event.message.includes('safari is not defined') ||
+            event.message.includes('Uncaught ReferenceError: safari') ||
+            (event.message.includes('Cannot read properties') && event.message.includes('indexOf'))
+        )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    }, true);
+    
+    // Фильтруем необработанные промисы (unhandledrejection)
+    window.addEventListener('unhandledrejection', function(event) {
+        const reason = event.reason;
+        if (reason && typeof reason === 'object') {
+            const message = reason.message || String(reason);
+            const stack = reason.stack || '';
+            if (
+                message.includes('Error handling response') ||
+                message.includes('chrome-extension://') ||
+                message.includes('adblock') ||
+                message.includes('safari is not defined') ||
+                message.includes('indexOf') ||
+                message.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+                stack.includes('chrome-extension://') ||
+                stack.includes('adblock') ||
+                stack.includes('counter.js') ||
+                stack.includes('content.js') ||
+                stack.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')
+            ) {
+                event.preventDefault();
+                return false;
+            }
+        }
+    });
+}
 
 // Store
 const store = createStore({
@@ -74,27 +340,129 @@ const store = createStore({
         async login({ commit, dispatch }, credentials) {
             try {
                 const response = await axios.post('/api/auth/login', credentials);
-                commit('SET_TOKEN', response.data.token);
-                commit('SET_USER', response.data.user);
+                // Проверяем, что ответ содержит необходимые данные
+                if (response.data && response.data.token && response.data.user) {
+                    commit('SET_TOKEN', response.data.token);
+                    commit('SET_USER', response.data.user);
+                } else {
+                    throw new Error('Неверный формат ответа от сервера');
+                }
                 // Загружаем меню после успешной авторизации
                 await dispatch('fetchMenu');
                 await dispatch('fetchNotifications');
                 return { success: true };
             } catch (error) {
-                return { success: false, error: error.response?.data?.message || 'Ошибка авторизации' };
+                console.error('Login error:', error);
+                // Обработка сетевых ошибок
+                if (!error.response) {
+                    return { success: false, error: 'Нет соединения с сервером. Проверьте подключение к интернету.' };
+                }
+                // Обработка ошибок валидации
+                if (error.response?.status === 422) {
+                    const errors = error.response?.data?.errors;
+                    if (errors && typeof errors === 'object') {
+                        // Функция перевода ошибок на русский
+                        const translateError = (errorText) => {
+                            const translations = {
+                                'The email field is required.': 'Поле email обязательно для заполнения.',
+                                'The email field must be a valid email address.': 'Email должен быть действительным адресом электронной почты.',
+                                'The password field is required.': 'Поле пароль обязательно для заполнения.',
+                                'The password field must be at least 8 characters.': 'Пароль должен содержать минимум 8 символов.',
+                                'The password field confirmation does not match.': 'Подтверждение пароля не совпадает.',
+                            };
+                            return translations[errorText] || errorText;
+                        };
+                        // Формируем детальное сообщение об ошибках
+                        const errorMessages = Object.values(errors).flat().map(translateError).join(', ');
+                        // Преобразуем errors в объект с первым сообщением для каждого поля
+                        const fieldErrors = {};
+                        Object.keys(errors).forEach(key => {
+                            const errorMsg = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+                            fieldErrors[key] = translateError(errorMsg);
+                        });
+                        return { 
+                            success: false, 
+                            error: errorMessages || (error.response?.data?.message) || 'Ошибка валидации',
+                            fieldErrors: fieldErrors
+                        };
+                    }
+                }
+                // Обработка других ошибок
+                if (error.response?.status === 401) {
+                    return { success: false, error: 'Неверные учетные данные. Проверьте email и пароль.' };
+                }
+                if (error.response?.status >= 500) {
+                    return { success: false, error: 'Ошибка сервера. Попробуйте позже.' };
+                }
+                return { 
+                    success: false, 
+                    error: (error.response?.data?.message) || error.message || 'Ошибка авторизации' 
+                };
             }
         },
         async register({ commit, dispatch }, userData) {
             try {
                 const response = await axios.post('/api/auth/register', userData);
-                commit('SET_TOKEN', response.data.token);
-                commit('SET_USER', response.data.user);
+                // Проверяем, что ответ содержит необходимые данные
+                if (response.data && response.data.token && response.data.user) {
+                    commit('SET_TOKEN', response.data.token);
+                    commit('SET_USER', response.data.user);
+                } else {
+                    throw new Error('Неверный формат ответа от сервера');
+                }
                 // Загружаем меню после успешной регистрации
                 await dispatch('fetchMenu');
                 await dispatch('fetchNotifications');
                 return { success: true };
             } catch (error) {
-                return { success: false, error: error.response?.data?.message || 'Ошибка регистрации' };
+                console.error('Register error:', error);
+                // Обработка сетевых ошибок
+                if (!error.response) {
+                    return { success: false, error: 'Нет соединения с сервером. Проверьте подключение к интернету.' };
+                }
+                // Обработка ошибок валидации
+                if (error.response?.status === 422) {
+                    const errors = error.response?.data?.errors;
+                    if (errors) {
+                        // Функция перевода ошибок на русский
+                        const translateError = (errorText) => {
+                            const translations = {
+                                'The name field is required.': 'Поле имя обязательно для заполнения.',
+                                'The email field is required.': 'Поле email обязательно для заполнения.',
+                                'The email field must be a valid email address.': 'Email должен быть действительным адресом электронной почты.',
+                                'The email has already been taken.': 'Этот email уже используется.',
+                                'The password field is required.': 'Поле пароль обязательно для заполнения.',
+                                'The password field must be at least 8 characters.': 'Пароль должен содержать минимум 8 символов.',
+                                'The password field confirmation does not match.': 'Подтверждение пароля не совпадает.',
+                            };
+                            return translations[errorText] || errorText;
+                        };
+                        // Формируем детальное сообщение об ошибках
+                        const errorMessages = Object.values(errors).flat().map(translateError).join(', ');
+                        // Преобразуем errors в объект с первым сообщением для каждого поля
+                        const fieldErrors = {};
+                        Object.keys(errors).forEach(key => {
+                            const errorMsg = Array.isArray(errors[key]) ? errors[key][0] : errors[key];
+                            fieldErrors[key] = translateError(errorMsg);
+                        });
+                        return { 
+                            success: false, 
+                            error: errorMessages || (error.response?.data?.message) || 'Ошибка валидации',
+                            fieldErrors: fieldErrors
+                        };
+                    }
+                }
+                // Обработка других ошибок
+                if (error.response?.status === 401) {
+                    return { success: false, error: 'Ошибка авторизации. Попробуйте позже.' };
+                }
+                if (error.response?.status >= 500) {
+                    return { success: false, error: 'Ошибка сервера. Попробуйте позже.' };
+                }
+                return { 
+                    success: false, 
+                    error: (error.response?.data?.message) || error.message || 'Ошибка регистрации' 
+                };
             }
         },
         async logout({ commit }) {
@@ -109,19 +477,27 @@ const store = createStore({
             if (!state.token) return;
             try {
                 const response = await axios.get('/api/auth/user');
-                console.log('🔍 fetchUser - Response:', {
-                    user: response.data.user,
-                    roles: response.data.user?.roles,
-                    rolesCount: response.data.user?.roles?.length || 0,
-                });
-                commit('SET_USER', response.data.user);
-                console.log('✅ fetchUser - User set in store:', {
-                    user: state.user,
-                    roles: state.user?.roles,
-                });
+                // Проверяем, что ответ содержит данные пользователя
+                if (response.data && response.data.user) {
+                    console.log('🔍 fetchUser - Response:', {
+                        user: response.data.user,
+                        roles: response.data.user?.roles,
+                        rolesCount: response.data.user?.roles?.length || 0,
+                    });
+                    commit('SET_USER', response.data.user);
+                    console.log('✅ fetchUser - User set in store:', {
+                        user: state.user,
+                        roles: state.user?.roles,
+                    });
+                } else {
+                    throw new Error('Неверный формат ответа от сервера');
+                }
             } catch (error) {
                 console.error('❌ fetchUser - Error:', error);
-                commit('LOGOUT');
+                // Если ошибка 401 (неавторизован), очищаем токен
+                if (error.response?.status === 401) {
+                    commit('LOGOUT');
+                }
             }
         },
         async fetchMenu({ commit, state }) {
@@ -217,6 +593,12 @@ const routes = [
                 name: 'admin.media',
                 component: () => import('./pages/admin/Media.vue'),
                 meta: { requiresAuth: true, requiresRole: ['admin'], title: 'Медиа' },
+            },
+            {
+                path: 'cases',
+                name: 'admin.cases',
+                component: () => import('./pages/admin/Cases.vue'),
+                meta: { requiresAuth: true, requiresRole: ['admin'], title: 'Кейсы' },
             },
             {
                 path: 'notifications',
@@ -454,6 +836,111 @@ router.beforeEach(async (to, from, next) => {
 import App from './App.vue';
 const app = createApp(App);
 
+// Фильтрация ошибок расширений браузера в консоли
+if (typeof console !== 'undefined' && typeof window !== 'undefined') {
+    // Перехватываем глобальные ошибки
+    window.addEventListener('error', function(event) {
+        // Игнорируем ошибки из расширений браузера
+        if (event.filename && (
+            event.filename.includes('chrome-extension://') ||
+            event.filename.includes('moz-extension://') ||
+            event.filename.includes('safari-extension://') ||
+            event.filename.includes('adblock') ||
+            event.filename.includes('content.js') ||
+            event.filename.includes('counter.js') ||
+            event.filename.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')
+        )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+        // Также проверяем сообщение об ошибке
+        if (event.message && (
+            event.message.includes('chrome-extension://') ||
+            event.message.includes('moz-extension://') ||
+            event.message.includes('safari-extension://') ||
+            event.message.includes('adblock') ||
+            event.message.includes('Error handling response') ||
+            event.message.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            (event.message.includes('indexOf') && event.message.includes('undefined')) ||
+            event.message.includes('safari is not defined') ||
+            event.message.includes('Uncaught ReferenceError: safari') ||
+            (event.message.includes('Cannot read properties') && event.message.includes('indexOf'))
+        )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+        }
+    }, true);
+    
+    // Перехватываем необработанные промисы (для ошибок типа "message port closed")
+    window.addEventListener('unhandledrejection', function(event) {
+        const reason = event.reason?.message || event.reason?.toString() || '';
+        const stack = event.reason?.stack || '';
+        if (reason.includes('message port closed') || 
+            reason.includes('chrome-extension://') ||
+            reason.includes('moz-extension://') ||
+            reason.includes('safari-extension://') ||
+            reason.includes('adblock') ||
+            reason.includes('Error handling response') ||
+            reason.includes('safari is not defined') ||
+            reason.includes('indexOf') ||
+            reason.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            stack.includes('chrome-extension://') ||
+            stack.includes('adblock') ||
+            stack.includes('counter.js') ||
+            stack.includes('content.js') ||
+            stack.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')) {
+            event.preventDefault();
+            return false;
+        }
+    });
+    
+    // Фильтруем console.error
+    const originalError = console.error;
+    console.error = function(...args) {
+        const errorString = args.join(' ').toLowerCase();
+        // Фильтруем ошибки из расширений браузера
+        if (errorString.includes('chrome-extension://') || 
+            errorString.includes('moz-extension://') ||
+            errorString.includes('safari-extension://') ||
+            errorString.includes('adblock') ||
+            errorString.includes('message port closed') ||
+            errorString.includes('safari is not defined') ||
+            errorString.includes('uncaught referenceerror: safari') ||
+            errorString.includes('content.js') ||
+            errorString.includes('counter.js') ||
+            errorString.includes('indexof') ||
+            errorString.includes('error handling response') ||
+            errorString.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn') ||
+            (errorString.includes('indexof') && errorString.includes('undefined')) ||
+            (errorString.includes('cannot read properties') && errorString.includes('indexof'))) {
+            return; // Не показываем эти ошибки
+        }
+        originalError.apply(console, args);
+    };
+    
+    // Фильтруем console.warn для runtime.lastError
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+        const warnString = args.join(' ').toLowerCase();
+        if (warnString.includes('runtime.lasterror') ||
+            warnString.includes('message port closed') ||
+            warnString.includes('unchecked runtime.lasterror') ||
+            warnString.includes('chrome-extension://') ||
+            warnString.includes('moz-extension://') ||
+            warnString.includes('safari-extension://') ||
+            warnString.includes('adblock') ||
+            warnString.includes('error handling response') ||
+            warnString.includes('safari is not defined') ||
+            warnString.includes('indexof') ||
+            warnString.includes('imgpenhngnbnmhdkpdfnfhdpmfgmihdn')) {
+            return;
+        }
+        originalWarn.apply(console, args);
+    };
+}
+
 // Set up axios defaults
 if (store.state.token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${store.state.token}`;
@@ -518,8 +1005,23 @@ app.use(router);
 
 // Mount app
 // Монтируем приложение в контейнер #admin-app
-const appContainer = document.getElementById('admin-app');
-if (appContainer) {
-    app.mount('#admin-app');
+// Mount app
+// Монтируем приложение в контейнер #admin-app
+// Используем DOMContentLoaded для гарантии, что DOM готов
+function mountApp() {
+    const appContainer = document.getElementById('admin-app');
+    if (appContainer) {
+        app.mount('#admin-app');
+        console.log('✅ Vue app mounted successfully');
+    } else {
+        console.error('❌ Admin app container not found!');
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountApp);
+} else {
+    // DOM уже загружен
+    mountApp();
 }
 

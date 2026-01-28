@@ -196,8 +196,10 @@ export default {
                     const hasActiveChild = item.children.some(child => child.route === currentRoute);
                     if (hasActiveChild) {
                         const key = getMenuItemKey(item);
-                        if (!expandedItems.value.includes(key)) {
-                            expandedItems.value.push(key);
+                        if (expandedItems.value && Array.isArray(expandedItems.value)) {
+                            if (!expandedItems.value.includes(key)) {
+                                expandedItems.value.push(key);
+                            }
                         }
                     }
                 }
@@ -246,6 +248,9 @@ export default {
 
         const toggleExpanded = (item) => {
             const key = getMenuItemKey(item);
+            if (!expandedItems.value || !Array.isArray(expandedItems.value)) {
+                expandedItems.value = [];
+            }
             const index = expandedItems.value.indexOf(key);
             if (index > -1) {
                 expandedItems.value.splice(index, 1);
@@ -256,6 +261,9 @@ export default {
 
         const isExpanded = (item) => {
             const key = getMenuItemKey(item);
+            if (!expandedItems.value || !Array.isArray(expandedItems.value)) {
+                return false;
+            }
             return expandedItems.value.includes(key);
         };
 

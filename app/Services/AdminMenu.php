@@ -23,6 +23,12 @@ class AdminMenu
                 'roles' => ['admin', 'manager'],
             ],
             [
+                'title' => 'Кейсы',
+                'route' => 'admin.cases',
+                'icon' => 'folder',
+                'roles' => ['admin', 'manager'],
+            ],
+            [
                 'title' => 'Уведомления',
                 'route' => 'admin.notifications',
                 'icon' => 'bell',

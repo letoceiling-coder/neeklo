@@ -1,6 +1,6 @@
 {
-  "_StatusBadge-Btc_-Pk8.js": {
-    "file": "assets/StatusBadge-Btc_-Pk8.js",
+  "_StatusBadge-DxeriLa3.js": {
+    "file": "assets/StatusBadge-DxeriLa3.js",
     "name": "StatusBadge",
     "imports": [
       "resources/js/admin.js"
@@ -15,7 +15,7 @@
     "name": "sweetalert2.esm.all"
   },
   "resources/css/app.css": {
-    "file": "assets/app-S1KbmLy9.css",
+    "file": "assets/app-C7qN06T3.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -24,7 +24,7 @@
     ]
   },
   "resources/js/admin.js": {
-    "file": "assets/admin-DPKsFKaQ.js",
+    "file": "assets/admin-DjQGoEOB.js",
     "name": "admin",
     "src": "resources/js/admin.js",
     "isEntry": true,
@@ -36,6 +36,7 @@
       "resources/js/layouts/AdminLayout.vue",
       "resources/js/pages/admin/Dashboard.vue",
       "resources/js/pages/admin/Media.vue",
+      "resources/js/pages/admin/Cases.vue",
       "resources/js/pages/admin/Notifications.vue",
       "resources/js/pages/admin/Users.vue",
       "resources/js/pages/admin/Roles.vue",
@@ -47,7 +48,7 @@
     ]
   },
   "resources/js/layouts/AdminLayout.vue": {
-    "file": "assets/AdminLayout-mJSGMb3O.js",
+    "file": "assets/AdminLayout-BX7m6JPX.js",
     "name": "AdminLayout",
     "src": "resources/js/layouts/AdminLayout.vue",
     "isDynamicEntry": true,
@@ -56,7 +57,7 @@
     ]
   },
   "resources/js/pages/admin/Bots.vue": {
-    "file": "assets/Bots-Cnu6Ezp8.js",
+    "file": "assets/Bots-BHPbqdpS.js",
     "name": "Bots",
     "src": "resources/js/pages/admin/Bots.vue",
     "isDynamicEntry": true,
@@ -66,8 +67,20 @@
       "_sweetalert2.esm.all-C0u8rGqG.js"
     ]
   },
+  "resources/js/pages/admin/Cases.vue": {
+    "file": "assets/Cases-B9bIC7aG.js",
+    "name": "Cases",
+    "src": "resources/js/pages/admin/Cases.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/admin.js"
+    ],
+    "css": [
+      "assets/Cases-Dk-bs0Ph.css"
+    ]
+  },
   "resources/js/pages/admin/Dashboard.vue": {
-    "file": "assets/Dashboard-BIHDQT7X.js",
+    "file": "assets/Dashboard-DQd2WPWI.js",
     "name": "Dashboard",
     "src": "resources/js/pages/admin/Dashboard.vue",
     "isDynamicEntry": true,
@@ -79,7 +92,7 @@
     ]
   },
   "resources/js/pages/admin/Documentation.vue": {
-    "file": "assets/Documentation-D-w245_z.js",
+    "file": "assets/Documentation-B5Pjm1qG.js",
     "name": "Documentation",
     "src": "resources/js/pages/admin/Documentation.vue",
     "isDynamicEntry": true,
@@ -87,11 +100,11 @@
       "resources/js/admin.js"
     ],
     "css": [
-      "assets/Documentation-tNpxse_g.css"
+      "assets/Documentation-wO5oFzuJ.css"
     ]
   },
   "resources/js/pages/admin/Media.vue": {
-    "file": "assets/Media-DCBgM7jD.js",
+    "file": "assets/Media-CbGIcGhH.js",
     "name": "Media",
     "src": "resources/js/pages/admin/Media.vue",
     "isDynamicEntry": true,
@@ -105,7 +118,7 @@
     ]
   },
   "resources/js/pages/admin/Notifications.vue": {
-    "file": "assets/Notifications-DI9npeeQ.js",
+    "file": "assets/Notifications-B5KLSmQF.js",
     "name": "Notifications",
     "src": "resources/js/pages/admin/Notifications.vue",
     "isDynamicEntry": true,
@@ -115,7 +128,7 @@
     ]
   },
   "resources/js/pages/admin/Roles.vue": {
-    "file": "assets/Roles-CFvdH-Xh.js",
+    "file": "assets/Roles-CkNh2ds-.js",
     "name": "Roles",
     "src": "resources/js/pages/admin/Roles.vue",
     "isDynamicEntry": true,
@@ -126,7 +139,7 @@
     ]
   },
   "resources/js/pages/admin/Subscription.vue": {
-    "file": "assets/Subscription-CjNalIYH.js",
+    "file": "assets/Subscription-BAeWiMXZ.js",
     "name": "Subscription",
     "src": "resources/js/pages/admin/Subscription.vue",
     "isDynamicEntry": true,
@@ -138,29 +151,29 @@
     ]
   },
   "resources/js/pages/admin/Support.vue": {
-    "file": "assets/Support-Cu1L-mTT.js",
+    "file": "assets/Support-Cr1NCrBh.js",
     "name": "Support",
     "src": "resources/js/pages/admin/Support.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/admin.js",
       "_sweetalert2.esm.all-C0u8rGqG.js",
-      "_StatusBadge-Btc_-Pk8.js"
+      "_StatusBadge-DxeriLa3.js"
     ]
   },
   "resources/js/pages/admin/SupportTicket.vue": {
-    "file": "assets/SupportTicket-8ZDLR7u8.js",
+    "file": "assets/SupportTicket-DtS4DPJr.js",
     "name": "SupportTicket",
     "src": "resources/js/pages/admin/SupportTicket.vue",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/admin.js",
       "_sweetalert2.esm.all-C0u8rGqG.js",
-      "_StatusBadge-Btc_-Pk8.js"
+      "_StatusBadge-DxeriLa3.js"
     ]
   },
   "resources/js/pages/admin/Users.vue": {
-    "file": "assets/Users-C7fCcuN5.js",
+    "file": "assets/Users-clU8LCCt.js",
     "name": "Users",
     "src": "resources/js/pages/admin/Users.vue",
     "isDynamicEntry": true,
@@ -171,7 +184,7 @@
     ]
   },
   "resources/js/pages/auth/ForgotPassword.vue": {
-    "file": "assets/ForgotPassword-S1x0tblY.js",
+    "file": "assets/ForgotPassword-C7W0OS3-.js",
     "name": "ForgotPassword",
     "src": "resources/js/pages/auth/ForgotPassword.vue",
     "isDynamicEntry": true,
@@ -180,7 +193,7 @@
     ]
   },
   "resources/js/pages/auth/Login.vue": {
-    "file": "assets/Login-Bm4jv7-W.js",
+    "file": "assets/Login-DdOLFKlv.js",
     "name": "Login",
     "src": "resources/js/pages/auth/Login.vue",
     "isDynamicEntry": true,
@@ -189,7 +202,7 @@
     ]
   },
   "resources/js/pages/auth/Register.vue": {
-    "file": "assets/Register-B6IgGu5D.js",
+    "file": "assets/Register-ytvXbG3C.js",
     "name": "Register",
     "src": "resources/js/pages/auth/Register.vue",
     "isDynamicEntry": true,
@@ -198,7 +211,7 @@
     ]
   },
   "resources/js/pages/auth/ResetPassword.vue": {
-    "file": "assets/ResetPassword-DHgmf3Mg.js",
+    "file": "assets/ResetPassword-BEpFCgxP.js",
     "name": "ResetPassword",
     "src": "resources/js/pages/auth/ResetPassword.vue",
     "isDynamicEntry": true,

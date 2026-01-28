@@ -17,9 +17,10 @@
                             v-model="form.email"
                             type="email"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.email ? 'border-red-500' : '']"
                             placeholder="your@email.com"
                         />
+                        <p v-if="fieldErrors.email" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.email }}</p>
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium mb-2">Пароль</label>
@@ -28,9 +29,10 @@
                             v-model="form.password"
                             type="password"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.password ? 'border-red-500' : '']"
                             placeholder="••••••••"
                         />
+                        <p v-if="fieldErrors.password" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.password }}</p>
                     </div>
                     <button
                         type="submit"
@@ -68,6 +70,7 @@ export default {
         const router = useRouter();
         const loading = ref(false);
         const error = ref('');
+        const fieldErrors = ref({});
         const form = ref({
             email: '',
             password: '',
@@ -76,6 +79,7 @@ export default {
         const handleSubmit = async () => {
             loading.value = true;
             error.value = '';
+            fieldErrors.value = {};
 
             const result = await store.dispatch('login', form.value);
 
@@ -83,6 +87,10 @@ export default {
                 router.push({ name: 'admin.dashboard' });
             } else {
                 error.value = result.error;
+                // Парсим ошибки полей, если они есть
+                if (result.fieldErrors) {
+                    fieldErrors.value = result.fieldErrors;
+                }
             }
 
             loading.value = false;
@@ -92,6 +100,7 @@ export default {
             form,
             loading,
             error,
+            fieldErrors,
             handleSubmit,
         };
     },

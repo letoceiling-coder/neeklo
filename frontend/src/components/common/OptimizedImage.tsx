@@ -14,10 +14,15 @@ interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 
 // Check WebP support once
 const supportsWebP = (() => {
   if (typeof window === 'undefined') return false;
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 1;
+    const dataUrl = canvas.toDataURL('image/webp');
+    return dataUrl && typeof dataUrl === 'string' && dataUrl.indexOf('data:image/webp') === 0;
+  } catch (e) {
+    return false;
+  }
 })();
 
 export const OptimizedImage = memo(function OptimizedImage({

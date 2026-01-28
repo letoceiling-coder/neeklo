@@ -128,7 +128,8 @@
       html.light body{color:#0a0a0a}
       
       /* Root fade-in - faster for perceived performance */
-      #root{opacity:0;animation:rootFadeIn .15s ease-out forwards;min-height:100vh}
+      #root{opacity:1;min-height:100vh}
+      /* Анимация будет применена через JavaScript после загрузки */
       @keyframes rootFadeIn{to{opacity:1}}
       
       /* Navigation skeleton */

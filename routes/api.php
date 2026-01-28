@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\AdminMenuController;
+use App\Http\Controllers\Api\CaseController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\UserController;
@@ -51,6 +52,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('media/trash/empty', [MediaController::class, 'emptyTrash'])->name('media.trash.empty');
         Route::apiResource('media', MediaController::class);
         
+        // Кейсы — админ (создание, редактирование, медиа)
+        Route::get('cases/{id}', [CaseController::class, 'show']);
+        Route::post('cases', [CaseController::class, 'store']);
+        Route::put('cases/{id}', [CaseController::class, 'update']);
+        Route::post('cases/{id}/media', [CaseController::class, 'uploadCaseMedia']);
+        Route::delete('cases/media/{mediaId}', [CaseController::class, 'deleteCaseMedia']);
+        Route::post('cases/{id}/media/reorder', [CaseController::class, 'reorderCaseMedia']);
+
         // Admin only routes (Roles and Users management)
         Route::middleware('admin')->group(function () {
             Route::apiResource('roles', RoleController::class);
@@ -95,6 +104,10 @@ Route::post('/webhook/github', [\App\Http\Controllers\Api\WebhookController::cla
 
 // Проверка подписки (публичный endpoint, используется фронтендом)
 Route::get('/subscription/check', [\App\Http\Controllers\Api\SubscriptionCheckController::class, 'check']);
+
+// Кейсы — публичные для сайта
+Route::get('/cases', [CaseController::class, 'index']);
+Route::get('/cases/slug/{slug}', [CaseController::class, 'showBySlug']);
 
 // Публичные роуты для brief submissions (формы на сайте)
 Route::prefix('brief-submissions')->group(function () {

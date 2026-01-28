@@ -17,9 +17,10 @@
                             v-model="form.name"
                             type="text"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.name ? 'border-red-500' : '']"
                             placeholder="Иван Иванов"
                         />
+                        <p v-if="fieldErrors.name" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.name }}</p>
                     </div>
                     <div>
                         <label for="email" class="block text-sm font-medium mb-2">Email</label>
@@ -28,9 +29,10 @@
                             v-model="form.email"
                             type="email"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.email ? 'border-red-500' : '']"
                             placeholder="your@email.com"
                         />
+                        <p v-if="fieldErrors.email" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.email }}</p>
                     </div>
                     <div>
                         <label for="password" class="block text-sm font-medium mb-2">Пароль</label>
@@ -39,11 +41,12 @@
                             v-model="form.password"
                             type="password"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.password ? 'border-red-500' : '']"
                             placeholder="Минимум 8 символов"
                         />
-                        <p class="mt-1 text-xs text-muted-foreground">
-                            Пароль должен содержать буквы разного регистра, цифры и символы
+                        <p v-if="fieldErrors.password" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.password }}</p>
+                        <p v-else class="mt-1 text-xs text-muted-foreground">
+                            Пароль должен содержать минимум 8 символов
                         </p>
                     </div>
                     <div>
@@ -53,9 +56,10 @@
                             v-model="form.password_confirmation"
                             type="password"
                             required
-                            class="w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20"
+                            :class="['w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors disabled:opacity-50 border-input focus:border-ring focus:ring-ring/20', fieldErrors.password_confirmation ? 'border-red-500' : '']"
                             placeholder="Повторите пароль"
                         />
+                        <p v-if="fieldErrors.password_confirmation" class="mt-1 text-xs text-red-600 dark:text-red-400">{{ fieldErrors.password_confirmation }}</p>
                     </div>
                     <button
                         type="submit"
@@ -87,6 +91,7 @@ export default {
         const router = useRouter();
         const loading = ref(false);
         const error = ref('');
+        const fieldErrors = ref({});
         const form = ref({
             name: '',
             email: '',
@@ -97,6 +102,7 @@ export default {
         const handleSubmit = async () => {
             loading.value = true;
             error.value = '';
+            fieldErrors.value = {};
 
             const result = await store.dispatch('register', form.value);
 
@@ -104,6 +110,10 @@ export default {
                 router.push({ name: 'admin.dashboard' });
             } else {
                 error.value = result.error;
+                // Парсим ошибки полей, если они есть
+                if (result.fieldErrors) {
+                    fieldErrors.value = result.fieldErrors;
+                }
             }
 
             loading.value = false;
@@ -113,6 +123,7 @@ export default {
             form,
             loading,
             error,
+            fieldErrors,
             handleSubmit,
         };
     },

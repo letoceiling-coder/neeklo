@@ -9,6 +9,130 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    strictPort: true,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 8080,
+      clientPort: 8080,
+    },
+    // Отключаем автоматическое обновление для статических файлов
+    watch: {
+      ignored: ['**/node_modules/**', '**/.git/**'],
+    },
+    proxy: {
+      '/admin': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false, // Отключаем WebSocket для /admin (это HTML страница)
+        rewrite: (path) => path,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Сохраняем оригинальный host для правильной работы Laravel
+            proxyReq.setHeader('Host', '127.0.0.1:8000');
+            // Убеждаемся, что это обычный HTTP запрос
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+            proxyReq.setHeader('Connection', 'close');
+          });
+          proxy.on('error', (err, req, res) => {
+            // Игнорируем ошибки WebSocket для /admin
+            if (req.url?.includes('/admin')) {
+              return;
+            }
+          });
+        },
+      },
+      '/api': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false, // API не использует WebSocket
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Убеждаемся, что это обычный HTTP запрос
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+          });
+        },
+      },
+      '/storage': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false, // Статические файлы, WebSocket не нужен
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+            proxyReq.setHeader('Connection', 'close');
+          });
+        },
+      },
+      '/build': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false, // Статические файлы, WebSocket не нужен
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Убеждаемся, что это обычный HTTP запрос
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+            proxyReq.setHeader('Connection', 'close');
+          });
+        },
+      },
+      '/favicon.ico': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            // Убеждаемся, что это обычный HTTP запрос, не WebSocket
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+            proxyReq.setHeader('Connection', 'close');
+          });
+          proxy.on('error', (err, req, res) => {
+            // Игнорируем ошибки WebSocket для статических файлов
+            if (req.url?.includes('favicon.ico')) {
+              return;
+            }
+          });
+        },
+      },
+      '/manifest.webmanifest': {
+        target: 'http://127.0.0.1:8000',
+        changeOrigin: true,
+        secure: false,
+        ws: false,
+        configure: (proxy, _options) => {
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            proxyReq.removeHeader('upgrade');
+            proxyReq.removeHeader('connection');
+            proxyReq.setHeader('Connection', 'close');
+          });
+        },
+      },
+      // Проксирование для Laravel Vite ресурсов (только для /resources, не для /@vite)
+      // /@vite - это внутренние пути React Vite, их не нужно проксировать
+      '/resources': {
+        target: 'http://127.0.0.1:5173',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      },
+      // Проксирование для node_modules из Laravel Vite
+      '/node_modules': {
+        target: 'http://127.0.0.1:5173',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path,
+      },
+    },
   },
   plugins: [
     react(), 
@@ -16,6 +140,8 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'robots.txt'],
+      injectManifest: false,
+      strategies: 'generateSW',
       manifest: {
         name: 'Neeklo Studio — Digital-студия',
         short_name: 'Neeklo',

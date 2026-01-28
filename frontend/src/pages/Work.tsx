@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/layout/Footer";
@@ -7,6 +7,7 @@ import { CaseCard } from "@/components/common/CaseCard";
 import { Button } from "@/components/common/Button";
 import { useMetaTags } from "@/hooks/useMetaTags";
 import { StructuredData } from "@/components/common/StructuredData";
+import { getCases, resolveStorageUrl } from "@/lib/api";
 import casesData from "@/data/cases.json";
 
 const categories = [
@@ -23,8 +24,8 @@ const categories = [
 
 const ITEMS_PER_PAGE = 12;
 
-// Structured data for portfolio page
-const workStructuredData = {
+// Structured data for portfolio page (uses casesData for initial, replaced in component)
+const buildWorkStructuredData = (items: { slug?: string; title?: string; description?: string; category?: string }[]) => ({
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": "Портфолио Neeklo Studio",
@@ -33,24 +34,24 @@ const workStructuredData = {
   "mainEntity": {
     "@type": "ItemList",
     "name": "Избранные проекты",
-    "numberOfItems": casesData.length,
-    "itemListElement": casesData.slice(0, 15).map((project, index) => ({
+    "numberOfItems": items.length,
+    "itemListElement": items.slice(0, 15).map((project, index) => ({
       "@type": "ListItem",
       "position": index + 1,
       "item": {
         "@type": "CreativeWork",
         "name": project.title,
-        "description": project.description || project.results?.[0],
+        "description": (project as { description?: string; results?: string[] }).description || (project as { results?: string[] }).results?.[0],
         "url": `https://neeklo.ru/work/${project.slug}`,
         "creator": {
           "@type": "Organization",
           "name": "Neeklo Studio"
         },
-        "genre": project.category
+        "genre": (project as { category?: string }).category
       }
     }))
   }
-};
+});
 
 const Work = () => {
   useMetaTags(
@@ -64,13 +65,20 @@ const Work = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const categoryParam = searchParams.get("category") || "all";
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
+  const [apiCases, setApiCases] = useState<typeof casesData | null>(null);
+
+  useEffect(() => {
+    getCases().then((r) => {
+      if (r.success && r.data && r.data.length > 0) setApiCases(r.data as typeof casesData);
+    });
+  }, []);
+
+  const list = (apiCases && apiCases.length > 0) ? apiCases : casesData;
 
   const filteredCases = useMemo(() => {
-    if (categoryParam === "all") {
-      return casesData;
-    }
-    return casesData.filter(c => c.category === categoryParam);
-  }, [categoryParam]);
+    if (categoryParam === "all") return list;
+    return list.filter((c: { category?: string }) => c.category === categoryParam);
+  }, [categoryParam, list]);
 
   const displayedCases = filteredCases.slice(0, visibleItems);
   const hasMore = visibleItems < filteredCases.length;
@@ -87,7 +95,7 @@ const Work = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <StructuredData data={workStructuredData} />
+      <StructuredData data={buildWorkStructuredData(list)} />
       <main className="pt-32 pb-20">
         <Container>
           {/* Hero Section */}
@@ -138,18 +146,18 @@ const Work = () => {
             transition={{ duration: 0.4 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12"
           >
-            {displayedCases.map((project, index) => (
+            {displayedCases.map((project: { id: number; slug: string; title: string; category?: string; cover?: string; coverPoster?: string; video?: string; coverVideo?: string; gallery?: { type?: string }[] }, index) => (
               <CaseCard
                 key={project.id}
                 id={project.id}
                 slug={project.slug}
                 title={project.title}
-                category={project.category}
-                coverPoster={project.coverPoster}
-                coverVideo={project.coverVideo}
+                category={project.category || ''}
+                coverPoster={(project as { cover?: string }).cover ? resolveStorageUrl((project as { cover?: string }).cover) : (project as { coverPoster?: string }).coverPoster}
+                coverVideo={(project as { video?: string }).video ? resolveStorageUrl((project as { video?: string }).video) : (project as { coverVideo?: string }).coverVideo}
                 delay={index * 0.05}
                 priority={index < 3}
-                hasVideo={project.gallery?.some(g => g.type === 'video') || !!project.coverVideo}
+                hasVideo={!!(project as { video?: string }).video || !!(project as { coverVideo?: string }).coverVideo || (project as { gallery?: { type?: string }[] }).gallery?.some(g => g.type === 'video')}
               />
             ))}
           </motion.div>

@@ -251,8 +251,18 @@ Route::get('/build/assets/{path}', function ($path) {
 Route::get('/manifest.webmanifest', function () {
     $filePath = public_path('frontend/manifest.webmanifest');
     if (file_exists($filePath)) {
-        return response()->file($filePath, [
-            'Content-Type' => 'application/manifest+json',
+        $content = file_get_contents($filePath);
+        // Убеждаемся, что это валидный JSON
+        $json = json_decode($content, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            \Log::error('Invalid manifest.webmanifest JSON', [
+                'error' => json_last_error_msg(),
+                'content' => substr($content, 0, 100)
+            ]);
+            abort(500, 'Invalid manifest file');
+        }
+        return response($content, 200, [
+            'Content-Type' => 'application/manifest+json; charset=utf-8',
             'Cache-Control' => 'public, max-age=31536000',
         ]);
     }
@@ -275,10 +285,15 @@ Route::get('/subscription-expired', [\App\Http\Controllers\SubscriptionExpiredCo
     ->name('subscription.expired');
 
 // Маршруты для админ-панели (Vue) - с проверкой подписки
+// ВАЖНО: этот роут должен быть ДО React роутов, чтобы перехватывать /admin
 Route::middleware('subscription.check')->group(function () {
-Route::get('/admin/{any?}', function () {
-    return view('admin');
-})->where('any', '.*')->name('admin');
+    Route::get('/admin', function () {
+        return view('admin');
+    })->name('admin.root');
+    
+    Route::get('/admin/{any}', function ($any) {
+        return view('admin');
+    })->where('any', '.*')->name('admin');
 });
 
 // Публичный роут для просмотра логов

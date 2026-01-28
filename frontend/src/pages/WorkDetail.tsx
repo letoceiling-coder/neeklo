@@ -1,5 +1,5 @@
 import { useParams, Navigate, Link } from "react-router-dom";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Footer } from "@/components/layout/Footer";
 import { Container } from "@/components/common/Container";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ArrowLeft, Clock, Users, Layers, CheckCircle } from "lucide-react";
 import { VideoPlayer } from "@/components/common/VideoPlayer";
 import { CaseMediaGallery } from "@/components/sections/CaseMediaGallery";
+import { getCases, resolveStorageUrl } from "@/lib/api";
 import casesData from "@/data/cases.json";
 
 // Import cover images
@@ -44,28 +45,69 @@ const galleryImages: Record<string, string> = {
   "batnorton-4.jpg": batnorton4,
 };
 
+type CaseRecord = {
+  slug?: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  year?: number;
+  cover?: string;
+  video?: string;
+  gallery?: { type?: string; src?: string; alt?: string }[];
+  coverPoster?: string;
+  coverVideo?: string;
+  client?: string;
+  role?: string;
+  duration?: string;
+  results?: string[];
+  metrics?: { value?: string; label?: string }[];
+  stack?: string[];
+  testimonial?: { text?: string; author?: string; position?: string };
+};
+
 const WorkDetail = () => {
   const { slug } = useParams<{ slug: string }>();
-  const caseData = casesData.find(c => c.slug === slug);
-  const currentIndex = casesData.findIndex(c => c.slug === slug);
-  const nextCase = casesData[currentIndex + 1] || casesData[0];
-  const prevCase = casesData[currentIndex - 1] || casesData[casesData.length - 1];
+  const [list, setList] = useState<CaseRecord[]>(casesData);
+
+  useEffect(() => {
+    getCases().then((r) => {
+      if (r.success && r.data && r.data.length > 0) setList(r.data as CaseRecord[]);
+    });
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [slug]);
 
-  // Debug: Log gallery images mapping for batnorton
-  useEffect(() => {
-    if (slug === 'batnorton' && caseData?.gallery) {
-      console.log('BatNorton gallery items:', caseData.gallery);
-      console.log('Gallery images map:', galleryImages);
-      caseData.gallery.forEach(item => {
-        const mappedSrc = galleryImages[item.src];
-        console.log(`Mapping ${item.src} -> ${mappedSrc || 'NOT FOUND'}`);
+  const caseData = list.find((c) => c.slug === slug) ?? null;
+  const currentIndex = list.findIndex((c) => c.slug === slug);
+  const nextCase = list[currentIndex + 1] || list[0];
+  const prevCase = list[currentIndex - 1] || list[list.length - 1];
+
+  const coverImageUrl = caseData?.cover
+    ? resolveStorageUrl(caseData.cover)
+    : (caseData?.slug && coverImages[caseData.slug]) || null;
+  const coverVideoUrl = caseData?.video
+    ? resolveStorageUrl(caseData.video)
+    : (caseData as { coverVideo?: string })?.coverVideo || null;
+
+  const galleryItems = useMemo(() => {
+    if (!caseData) return [];
+    const cover = caseData.cover ? resolveStorageUrl(caseData.cover) : (caseData.slug && coverImages[caseData.slug]) || undefined;
+    const out: { type: "image" | "video"; src: string; alt?: string; poster?: string }[] = [];
+    if (caseData.video || (caseData as { coverVideo?: string }).coverVideo) {
+      out.push({
+        type: "video",
+        src: caseData.video ? resolveStorageUrl(caseData.video) : (caseData as { coverVideo?: string }).coverVideo!,
+        poster: cover,
       });
     }
-  }, [slug, caseData]);
+    (caseData.gallery || []).forEach((g) => {
+      const src = galleryImages[g.src!] || (g.src && (g.src.startsWith("http") ? g.src : (g.src.startsWith("/") ? resolveStorageUrl(g.src) : `/${g.src}`)));
+      if (src) out.push({ type: (g.type as "image" | "video") || "image", src, alt: g.alt, poster: g.type === "video" ? cover : undefined });
+    });
+    return out;
+  }, [caseData]);
 
   if (!caseData) {
     return <Navigate to="/work" replace />;
@@ -73,10 +115,10 @@ const WorkDetail = () => {
 
   useMetaTags(
     `${caseData.title} | Neeklo Studio`,
-    caseData.description,
-    `https://neeklo.ru/cases/${caseData.coverPoster}`,
+    caseData.description || "",
+    (coverImageUrl && (coverImageUrl.startsWith("http") ? coverImageUrl : `https://neeklo.ru${coverImageUrl}`)) || "https://neeklo.ru/og-work.jpg",
     `https://neeklo.ru/work/${caseData.slug}`,
-    `${caseData.title}, ${caseData.category}, кейс, проект`
+    `${caseData.title}, ${caseData.category || ""}, кейс, проект`
   );
 
   const creativeWorkSchema = {
@@ -90,7 +132,7 @@ const WorkDetail = () => {
       "name": "Neeklo Studio",
       "url": "https://neeklo.ru"
     },
-    "datePublished": `${caseData.year}-01-01`,
+    "datePublished": `${caseData.year || new Date().getFullYear()}-01-01`,
     "keywords": caseData.category
   };
 
@@ -135,19 +177,19 @@ const WorkDetail = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-12"
           >
-            {caseData.coverVideo ? (
+            {coverVideoUrl ? (
               <VideoPlayer
-                src={caseData.coverVideo}
-                poster={coverImages[caseData.slug]}
-                title={caseData.title}
+                src={coverVideoUrl}
+                poster={coverImageUrl || undefined}
+                title={caseData.title || ""}
                 priority
                 className="w-full rounded-2xl shadow-2xl"
               />
-            ) : coverImages[caseData.slug] ? (
+            ) : coverImageUrl ? (
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src={coverImages[caseData.slug]}
-                  alt={caseData.title}
+                  src={coverImageUrl}
+                  alt={caseData.title || ""}
                   className="w-full h-full object-cover"
                   loading="eager"
                   fetchPriority="high"
@@ -157,60 +199,72 @@ const WorkDetail = () => {
             ) : (
               <div className="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[120px] md:text-[200px] font-bold text-foreground/5">{caseData.id}</span>
+                  <span className="text-[120px] md:text-[200px] font-bold text-foreground/5">{(caseData as { id?: number }).id ?? caseData.slug?.[0]?.toUpperCase()}</span>
                 </div>
               </div>
             )}
           </motion.div>
 
           {/* Quick Info Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16"
-          >
-            <div className="glass-effect rounded-xl p-4 md:p-6">
-              <Users className="w-5 h-5 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">Клиент</p>
-              <p className="font-medium text-sm md:text-base">{caseData.client}</p>
-            </div>
-            <div className="glass-effect rounded-xl p-4 md:p-6">
-              <Layers className="w-5 h-5 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">Роль</p>
-              <p className="font-medium text-sm md:text-base line-clamp-2">{caseData.role}</p>
-            </div>
-            <div className="glass-effect rounded-xl p-4 md:p-6">
-              <Clock className="w-5 h-5 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">Срок</p>
-              <p className="font-medium text-sm md:text-base">{caseData.duration}</p>
-            </div>
-            <div className="glass-effect rounded-xl p-4 md:p-6">
-              <CheckCircle className="w-5 h-5 text-primary mb-2" />
-              <p className="text-xs text-muted-foreground mb-1">Год</p>
-              <p className="font-medium text-sm md:text-base">{caseData.year}</p>
-            </div>
-          </motion.div>
+          {(caseData.client || caseData.role || caseData.duration || caseData.year) && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16"
+            >
+              {caseData.client && (
+                <div className="glass-effect rounded-xl p-4 md:p-6">
+                  <Users className="w-5 h-5 text-primary mb-2" />
+                  <p className="text-xs text-muted-foreground mb-1">Клиент</p>
+                  <p className="font-medium text-sm md:text-base">{caseData.client}</p>
+                </div>
+              )}
+              {caseData.role && (
+                <div className="glass-effect rounded-xl p-4 md:p-6">
+                  <Layers className="w-5 h-5 text-primary mb-2" />
+                  <p className="text-xs text-muted-foreground mb-1">Роль</p>
+                  <p className="font-medium text-sm md:text-base line-clamp-2">{caseData.role}</p>
+                </div>
+              )}
+              {caseData.duration && (
+                <div className="glass-effect rounded-xl p-4 md:p-6">
+                  <Clock className="w-5 h-5 text-primary mb-2" />
+                  <p className="text-xs text-muted-foreground mb-1">Срок</p>
+                  <p className="font-medium text-sm md:text-base">{caseData.duration}</p>
+                </div>
+              )}
+              {caseData.year && (
+                <div className="glass-effect rounded-xl p-4 md:p-6">
+                  <CheckCircle className="w-5 h-5 text-primary mb-2" />
+                  <p className="text-xs text-muted-foreground mb-1">Год</p>
+                  <p className="font-medium text-sm md:text-base">{caseData.year}</p>
+                </div>
+              )}
+            </motion.div>
+          )}
 
           {/* Results Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-16"
-          >
-            <h2 className="text-2xl md:text-3xl font-heading font-semibold mb-6">Результаты</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {caseData.results.map((result, index) => (
-                <div key={index} className="glass-effect rounded-xl p-6 border-l-4 border-primary">
-                  <p className="text-foreground font-medium">{result}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          {caseData.results && caseData.results.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="mb-16"
+            >
+              <h2 className="text-2xl md:text-3xl font-heading font-semibold mb-6">Результаты</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {caseData.results.map((result, index) => (
+                  <div key={index} className="glass-effect rounded-xl p-6 border-l-4 border-primary">
+                    <p className="text-foreground font-medium">{result}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Metrics Section */}
-          {caseData.metrics && caseData.metrics.length > 0 && (
+          {caseData.metrics && (caseData.metrics as { value?: string; label?: string }[]).length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -247,23 +301,8 @@ const WorkDetail = () => {
           </motion.div>
 
           {/* Media Gallery */}
-          {caseData.gallery && caseData.gallery.length > 0 && (
-            <CaseMediaGallery 
-              items={caseData.gallery.map(item => {
-                // Get image from galleryImages map or fallback to public path
-                const imageSrc = galleryImages[item.src];
-                if (!imageSrc) {
-                  console.warn(`Gallery image not found: ${item.src}`, galleryImages);
-                }
-                return {
-                  type: item.type as 'image' | 'video',
-                  src: imageSrc || (item.src.startsWith('/') ? item.src : `/${item.src}`),
-                  alt: item.alt,
-                  poster: item.type === 'video' ? coverImages[caseData.slug] : undefined
-                };
-              })} 
-              title="Галерея проекта" 
-            />
+          {galleryItems.length > 0 && (
+            <CaseMediaGallery items={galleryItems} title="Галерея проекта" />
           )}
 
           {/* Testimonial */}

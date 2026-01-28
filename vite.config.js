@@ -4,6 +4,19 @@ import tailwindcss from '@tailwindcss/vite';
 import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
+    server: {
+        host: "::",
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+            port: 8080, // HMR через проксирование на порту 8080
+            protocol: 'ws',
+        },
+        cors: {
+            origin: ['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:5173'],
+            credentials: true,
+        },
+    },
     plugins: [
         laravel({
             input: [
