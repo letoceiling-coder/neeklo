@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Send, Instagram, Linkedin, Youtube, Mail, MapPin } from "lucide-react";
+import { Send, Instagram, Linkedin, Youtube, Mail, MapPin, Hash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
@@ -144,6 +144,12 @@ export const Footer = () => {
                 <div className="flex items-center gap-2.5 text-base text-foreground/70">
                   <MapPin size={18} className="flex-shrink-0" />
                   Москва, Россия
+                </div>
+              </li>
+              <li>
+                <div className="flex items-center gap-2.5 text-base text-foreground/70">
+                  <Hash size={18} className="flex-shrink-0" />
+                  ИНН 263514478429
                 </div>
               </li>
             </ul>
